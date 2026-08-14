@@ -2,8 +2,10 @@
 declare(strict_types=1);
 
 use App\Aplicacao\ServicoAutenticacao;
+use App\Aplicacao\ServicoAdministracao;
 use App\Aplicacao\ServicoLeituras;
 use App\Http\Controladores\ControladorAutenticacao;
+use App\Http\Controladores\ControladorAdministracao;
 use App\Http\Controladores\ControladorLeituras;
 use App\Http\Resposta;
 use App\Infraestrutura\Arquivos\GerenciadorFotos;
@@ -20,6 +22,12 @@ $leituras = new ControladorLeituras(
     new ServicoLeituras(
         new RepositorioLeituras($configuracao['consumo']),
         new GerenciadorFotos($configuracao['uploads'], $configuracao['url_uploads'])
+    )
+);
+$administracao = new ControladorAdministracao(
+    new ServicoAdministracao(
+        new RepositorioUsuarios($configuracao['usuarios']),
+        new RepositorioLeituras($configuracao['consumo'])
     )
 );
 
@@ -41,6 +49,7 @@ try {
         case 'update_entry': $leituras->atualizar(); break;
         case 'delete_entry': $leituras->excluir(); break;
         case 'export': $leituras->exportar(); break;
+        case 'admin_dashboard': $administracao->painel(); break;
         default: Resposta::json(['message' => 'Ação desconhecida.'], 404);
     }
 } catch (DomainException $erro) {

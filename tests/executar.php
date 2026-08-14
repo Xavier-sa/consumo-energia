@@ -4,6 +4,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Aplicacao\ServicoAutenticacao;
+use App\Aplicacao\ServicoAdministracao;
 use App\Aplicacao\ServicoLeituras;
 use App\Dominio\Usuario;
 use App\Infraestrutura\Arquivos\GerenciadorFotos;
@@ -53,6 +54,14 @@ try {
         $novo = $usuarios[count($usuarios) - 1];
         afirmar(!isset($novo['password']), 'Cadastro não deve armazenar senha em texto simples.');
         afirmar(password_verify('senha-segura', $novo['password_hash']), 'Cadastro deve armazenar um hash válido.');
+        afirmar($sessao['role'] === 'user' && $novo['role'] === 'user', 'Cadastro novo deve permanecer usuário comum.');
+    });
+
+    executar('Xavier legado recebe e persiste o papel de administrador', function () use ($autenticacao, $usuariosArquivo): void {
+        $sessao = $autenticacao->entrar('XAVIER', 'outra-senha', '127.0.0.5');
+        afirmar($sessao['role'] === 'admin', 'Xavier deveria receber o papel admin.');
+        $usuarios = json_decode((string) file_get_contents($usuariosArquivo), true);
+        afirmar($usuarios[1]['role'] === 'admin', 'O papel admin deveria ser persistido no JSON.');
     });
 
     executar('cadastro duplicado é rejeitado sem gravar usuário', function () use ($autenticacao, $usuariosArquivo): void {
@@ -70,6 +79,20 @@ try {
         new RepositorioLeituras($leiturasArquivo),
         new GerenciadorFotos($base . '/uploads', 'uploads/')
     );
+
+    executar('painel administrativo agrega usuários e leituras sem segredos', function () use ($usuariosArquivo, $leiturasArquivo): void {
+        $painel = (new ServicoAdministracao(new RepositorioUsuarios($usuariosArquivo), new RepositorioLeituras($leiturasArquivo)))->painel();
+        afirmar(count($painel['usuarios']) === 3, 'O painel deveria listar os três usuários.');
+        afirmar(count($painel['leituras']) === 2, 'O painel deveria listar todas as leituras.');
+        afirmar($painel['leituras'][0]['usuarios'] === ['DARA', 'XAVIER'], 'A leitura legada deveria indicar os moradores da residência inicial.');
+        $json = json_encode($painel);
+        afirmar(strpos($json, 'password') === false && strpos($json, 'last_ip') === false && strpos($json, '127.0.0') === false && strpos($json, 'accesses') === false, 'O painel não deve expor credenciais, acessos ou IPs.');
+    });
+
+    executar('variação do nome Xavier não recebe poder administrativo', function () use ($autenticacao): void {
+        $sessao = $autenticacao->cadastrar('XAVIER.NOVO', 'senha-segura', '127.0.0.6');
+        afirmar($sessao['role'] === 'user', 'Uma conta nova com variação do nome Xavier deve ser comum.');
+    });
 
     executar('leituras legadas pertencem somente à residência inicial', function () use ($leituras): void {
         $inicial = $leituras->listar(1, 10, 1);

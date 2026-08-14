@@ -18,6 +18,7 @@ export const api = {
   criarLeitura: (dados) => requisitar('api.php?action=create_entry', { method: 'POST', body: dados }),
   atualizarLeitura: (id, dados) => requisitar(`api.php?action=update_entry&id=${id}`, { method: 'POST', body: dados }),
   excluirLeitura: (id) => requisitar(`api.php?action=delete_entry&id=${id}`, { method: 'POST' }),
+  painelAdmin: () => requisitar('api.php?action=admin_dashboard'),
   sair: () => requisitar('api.php?action=logout', { method: 'POST' }),
   urlExportacao: 'api.php?action=export',
 };

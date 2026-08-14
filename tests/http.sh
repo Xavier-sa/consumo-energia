@@ -15,7 +15,8 @@ trap encerrar EXIT
 cp -R "$raiz_projeto/app" "$raiz_projeto/public" "$raiz_projeto/views" "$raiz_projeto/data" "$raiz_projeto/bootstrap.php" "$diretorio_teste/"
 php -r '
 file_put_contents($argv[1] . "/data/usuarios.json", json_encode([
-    ["username" => "LEGADO", "password" => "senha-legada", "accesses" => []]
+    ["username" => "LEGADO", "password" => "senha-legada", "accesses" => []],
+    ["username" => "XAVIER", "password" => "senha-xavier", "accesses" => []]
 ]));
 file_put_contents($argv[1] . "/data/consumo.json", json_encode([
     ["identificador" => 1, "data" => "2026-08-13", "leitura_manha" => 515, "leitura_noite" => 518, "consumo" => 3],
@@ -43,9 +44,11 @@ requisitar() {
 cookie_alice="$diretorio_teste/alice.cookie"
 cookie_bob="$diretorio_teste/bob.cookie"
 cookie_legado="$diretorio_teste/legado.cookie"
+cookie_xavier="$diretorio_teste/xavier.cookie"
 resposta="$diretorio_teste/resposta"
 
 [[ $(requisitar "$cookie_alice" entries GET '' "$resposta") == '401' ]]
+[[ $(requisitar "$cookie_alice" admin_dashboard GET '' "$resposta") == '401' ]]
 [[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"diferente"}' "$resposta") == '422' ]]
 [[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '201' ]]
 grep -q '"username":"ALICE"' "$resposta"
@@ -76,5 +79,13 @@ grep -q '"message":"Usuário ou senha inválidos."' "$resposta"
 [[ $(requisitar "$cookie_legado" entries GET '' "$resposta") == '200' ]]
 grep -q '"total":2' "$resposta"
 grep -q '"leitura_noite":null' "$resposta"
+[[ $(requisitar "$cookie_legado" admin_dashboard GET '' "$resposta") == '403' ]]
+
+[[ $(requisitar "$cookie_xavier" login POST '{"username":"XAVIER","password":"senha-xavier"}' "$resposta") == '200' ]]
+grep -q '"role":"admin"' "$resposta"
+[[ $(requisitar "$cookie_xavier" admin_dashboard GET '' "$resposta") == '200' ]]
+grep -q '"username":"XAVIER"' "$resposta"
+grep -q '"leitura_noite":null' "$resposta"
+if grep -Eq 'password|last_ip|accesses|127\.0\.0' "$resposta"; then exit 1; fi
 
 echo '✓ rotas HTTP protegem sessão, cadastro e isolamento por residência'
