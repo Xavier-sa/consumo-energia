@@ -4,11 +4,6 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/componentes/botao.php';
 require_once dirname(__DIR__) . '/componentes/campo_foto.php';
 require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
-
-$arquivoCss = dirname(__DIR__, 2) . '/public/assets/css/main.css';
-$arquivoJs = dirname(__DIR__, 2) . '/public/assets/js/app.js';
-$versaoCss = (string) (filemtime($arquivoCss) ?: time());
-$versaoJs = (string) (filemtime($arquivoJs) ?: time());
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -17,7 +12,7 @@ $versaoJs = (string) (filemtime($arquivoJs) ?: time());
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#174c3c">
   <title>Meu Consumo de Energia</title>
-  <link rel="stylesheet" href="assets/css/main.css?v=<?= $versaoCss ?>">
+  <link rel="stylesheet" href="assets/css/main.css?v=20260814-2">
 </head>
 <body>
   <main id="app">
@@ -26,14 +21,28 @@ $versaoJs = (string) (filemtime($arquivoJs) ?: time());
       <div class="login-card">
         <p class="eyebrow">Bem-vindo de volta</p>
         <h1 id="login-title">Acompanhe sua energia</h1>
-        <p class="muted">Entre para registrar as leituras do seu medidor.</p>
+        <p class="muted" id="auth-description">Entre para registrar as leituras do seu medidor.</p>
+        <div class="auth-tabs" role="tablist" aria-label="Acesso">
+          <button type="button" id="show-login" role="tab" aria-selected="true">Entrar</button>
+          <button type="button" id="show-register" role="tab" aria-selected="false">Criar conta</button>
+        </div>
         <form id="login-form" novalidate>
           <label for="username">Usuário</label>
-          <select id="username" autocomplete="username"><option>DARA</option><option>XAVIER</option></select>
+          <input id="username" autocomplete="username" maxlength="30" required>
           <label for="password">Senha</label>
-          <input id="password" type="password" value="654321" autocomplete="current-password" required>
+          <input id="password" type="password" autocomplete="current-password" required>
           <?php botao('Entrar', 'btn-login', 'primary', 'submit', 'button-block'); ?>
           <p id="login-error" class="message message-error" role="alert" aria-live="polite"></p>
+        </form>
+        <form id="register-form" class="hidden" novalidate>
+          <label for="register-username">Escolha um usuário</label>
+          <input id="register-username" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9._-]+" required>
+          <label for="register-password">Crie uma senha</label>
+          <input id="register-password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+          <label for="register-confirmation">Confirme a senha</label>
+          <input id="register-confirmation" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+          <?php botao('Criar minha conta', 'btn-register', 'primary', 'submit', 'button-block'); ?>
+          <p id="register-error" class="message message-error" role="alert" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -89,6 +98,6 @@ $versaoJs = (string) (filemtime($arquivoJs) ?: time());
       </div>
     </div>
   </main>
-  <script type="module" src="assets/js/app.js?v=<?= $versaoJs ?>"></script>
+  <script type="module" src="assets/js/app.js?v=20260814-2"></script>
 </body>
 </html>

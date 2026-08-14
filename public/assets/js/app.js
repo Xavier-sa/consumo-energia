@@ -1,6 +1,6 @@
-import { api } from './api/cliente-api.js';
-import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814';
-import { criarHistorico } from './componentes/historico.js?v=20260814';
+import { api } from './api/cliente-api.js?v=20260814-2';
+import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814-2';
+import { criarHistorico } from './componentes/historico.js?v=20260814-2';
 import { dataExtensoHoje, formatarData } from './utilitarios/datas.js';
 
 const limite = 8;
@@ -46,6 +46,19 @@ async function iniciar() {
   });
 
   document.querySelector('#today-label').textContent = dataExtensoHoje();
+  function alternarAcesso(modo) {
+    const cadastro = modo === 'register';
+    document.querySelector('#login-form').classList.toggle('hidden', cadastro);
+    document.querySelector('#register-form').classList.toggle('hidden', !cadastro);
+    document.querySelector('#show-login').setAttribute('aria-selected', String(!cadastro));
+    document.querySelector('#show-register').setAttribute('aria-selected', String(cadastro));
+    document.querySelector('#auth-description').textContent = cadastro
+      ? 'Crie sua conta para ter um histórico privado de consumo.'
+      : 'Entre para registrar as leituras do seu medidor.';
+    document.querySelector(cadastro ? '#register-username' : '#username').focus();
+  }
+  document.querySelector('#show-login').addEventListener('click', () => alternarAcesso('login'));
+  document.querySelector('#show-register').addEventListener('click', () => alternarAcesso('register'));
   document.querySelector('#login-form').addEventListener('submit', async (evento) => {
     evento.preventDefault();
     try {
@@ -53,6 +66,17 @@ async function iniciar() {
       document.querySelector('#login-error').textContent = '';
       mostrarAplicacao(resposta.user.username);
     } catch (erro) { document.querySelector('#login-error').textContent = erro.message; }
+  });
+  document.querySelector('#register-form').addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    const usuario = document.querySelector('#register-username').value;
+    const senha = document.querySelector('#register-password').value;
+    const confirmacao = document.querySelector('#register-confirmation').value;
+    try {
+      const resposta = await api.cadastrar(usuario, senha, confirmacao);
+      document.querySelector('#register-error').textContent = '';
+      mostrarAplicacao(resposta.user.username);
+    } catch (erro) { document.querySelector('#register-error').textContent = erro.message; }
   });
   document.querySelector('#btn-logout').addEventListener('click', async () => { await api.sair(); location.reload(); });
   document.querySelector('#btn-export').addEventListener('click', () => {

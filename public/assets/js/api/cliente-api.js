@@ -12,6 +12,7 @@ async function requisitar(url, opcoes = {}) {
 
 export const api = {
   entrar: (usuario, senha) => requisitar('api.php?action=login', { method: 'POST', body: { username: usuario, password: senha } }),
+  cadastrar: (usuario, senha, confirmacao) => requisitar('api.php?action=register', { method: 'POST', body: { username: usuario, password: senha, password_confirmation: confirmacao } }),
   usuarioAtual: () => requisitar('api.php?action=me'),
   listarLeituras: (pagina = 1, limite = 8) => requisitar(`api.php?action=entries&page=${pagina}&limit=${limite}`),
   criarLeitura: (dados) => requisitar('api.php?action=create_entry', { method: 'POST', body: dados }),
