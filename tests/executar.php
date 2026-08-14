@@ -91,6 +91,31 @@ try {
         afirmar($leituras->listar(1, 10, 2)['total'] === 2, 'A residência 2 deveria ver a nova leitura.');
     });
 
+    executar('validação aplica limites de usuário e senha', function () use ($autenticacao): void {
+        foreach ([['AB', 'senha-forte'], ['USUARIO', 'curta']] as [$usuario, $senha]) {
+            try {
+                $autenticacao->cadastrar($usuario, $senha, '127.0.0.4');
+                afirmar(false, 'Dados fora dos limites deveriam falhar.');
+            } catch (DomainException $erro) {
+                afirmar($erro->getMessage() !== '', 'A validação deveria explicar o limite inválido.');
+            }
+        }
+    });
+
+    executar('interface oferece login e cadastro com usuário livre', function (): void {
+        $pagina = (string) file_get_contents(dirname(__DIR__) . '/views/paginas/inicial.php');
+        afirmar(strpos($pagina, 'id="show-login"') !== false, 'A interface deveria oferecer a aba Entrar.');
+        afirmar(strpos($pagina, 'id="show-register"') !== false, 'A interface deveria oferecer a aba Criar conta.');
+        afirmar(strpos($pagina, '<input id="username"') !== false, 'O login deveria usar um campo livre de usuário.');
+        afirmar(strpos($pagina, '<select id="username"') === false, 'O login não deveria limitar usuários a um seletor fixo.');
+    });
+
+    executar('README divulga a aplicação sem webhook', function (): void {
+        $readme = (string) file_get_contents(dirname(__DIR__) . '/README.md');
+        afirmar(strpos($readme, 'https://consumo-energisa.wasxtech.com.br/public/') !== false, 'O README deveria conter a URL pública.');
+        afirmar(strpos($readme, 'webhooks.hostinger.com') === false, 'O README não deve conter webhook de deploy.');
+    });
+
     echo "Todos os testes passaram.\n";
 } finally {
     foreach (glob($base . '/uploads/*') ?: [] as $arquivo) unlink($arquivo);
