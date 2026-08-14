@@ -86,6 +86,6 @@ grep -q '"role":"admin"' "$resposta"
 [[ $(requisitar "$cookie_xavier" admin_dashboard GET '' "$resposta") == '200' ]]
 grep -q '"username":"XAVIER"' "$resposta"
 grep -q '"leitura_noite":null' "$resposta"
-if grep -Eq 'password|last_ip|127\.0\.0' "$resposta"; then exit 1; fi
+if grep -Eq 'password|last_ip|accesses|127\.0\.0' "$resposta"; then exit 1; fi
 
 echo '✓ rotas HTTP protegem sessão, cadastro e isolamento por residência'

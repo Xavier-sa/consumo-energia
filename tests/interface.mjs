@@ -72,4 +72,6 @@ assert.equal(elementosAdmin['#admin-dialog'].open, true);
 assert.equal(elementosAdmin['#admin-users-table tbody'].children.length, 1);
 assert.equal(elementosAdmin['#admin-readings-table tbody'].children.length, 1);
 assert.equal(elementosAdmin['#admin-message'].textContent, '');
+elementosAdmin['#btn-close-admin'].eventos.click();
+assert.equal(elementosAdmin['#admin-dialog'].open, false);
 console.log('✓ botão administrativo abre e preenche o modal');

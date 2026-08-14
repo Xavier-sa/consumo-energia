@@ -86,7 +86,12 @@ try {
         afirmar(count($painel['leituras']) === 2, 'O painel deveria listar todas as leituras.');
         afirmar($painel['leituras'][0]['usuarios'] === ['DARA', 'XAVIER'], 'A leitura legada deveria indicar os moradores da residência inicial.');
         $json = json_encode($painel);
-        afirmar(strpos($json, 'password') === false && strpos($json, 'last_ip') === false && strpos($json, '127.0.0') === false, 'O painel não deve expor credenciais ou IPs.');
+        afirmar(strpos($json, 'password') === false && strpos($json, 'last_ip') === false && strpos($json, '127.0.0') === false && strpos($json, 'accesses') === false, 'O painel não deve expor credenciais, acessos ou IPs.');
+    });
+
+    executar('variação do nome Xavier não recebe poder administrativo', function () use ($autenticacao): void {
+        $sessao = $autenticacao->cadastrar('XAVIER.NOVO', 'senha-segura', '127.0.0.6');
+        afirmar($sessao['role'] === 'user', 'Uma conta nova com variação do nome Xavier deve ser comum.');
     });
 
     executar('leituras legadas pertencem somente à residência inicial', function () use ($leituras): void {
