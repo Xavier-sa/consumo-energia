@@ -17,6 +17,7 @@ done < <(find public/assets/js -type f -name '*.js' -print0)
 
 echo "Executando testes da aplicação..."
 php tests/executar.php
+node --experimental-default-type=module tests/interface.mjs
 bash tests/http.sh
 
 echo "Verificando JSONs versionáveis..."

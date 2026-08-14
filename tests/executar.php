@@ -5,6 +5,7 @@ require dirname(__DIR__) . '/bootstrap.php';
 
 use App\Aplicacao\ServicoAutenticacao;
 use App\Aplicacao\ServicoLeituras;
+use App\Dominio\Usuario;
 use App\Infraestrutura\Arquivos\GerenciadorFotos;
 use App\Infraestrutura\Persistencia\RepositorioLeituras;
 use App\Infraestrutura\Persistencia\RepositorioUsuarios;
@@ -92,7 +93,7 @@ try {
     });
 
     executar('validação aplica limites de usuário e senha', function () use ($autenticacao): void {
-        foreach ([['AB', 'senha-forte'], ['USUARIO', 'curta']] as [$usuario, $senha]) {
+        foreach ([['AB', 'senha-forte'], ['USUARIO', '1234567']] as [$usuario, $senha]) {
             try {
                 $autenticacao->cadastrar($usuario, $senha, '127.0.0.4');
                 afirmar(false, 'Dados fora dos limites deveriam falhar.');
@@ -100,6 +101,7 @@ try {
                 afirmar($erro->getMessage() !== '', 'A validação deveria explicar o limite inválido.');
             }
         }
+        Usuario::validar('ABC', '12345678');
     });
 
     executar('interface oferece login e cadastro com usuário livre', function (): void {

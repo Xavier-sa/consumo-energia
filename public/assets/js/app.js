@@ -1,4 +1,5 @@
 import { api } from './api/cliente-api.js?v=20260814-2';
+import { criarControleAcesso } from './componentes/acesso.js?v=20260814-3';
 import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814-2';
 import { criarHistorico } from './componentes/historico.js?v=20260814-2';
 import { dataExtensoHoje, formatarData } from './utilitarios/datas.js';
@@ -46,19 +47,7 @@ async function iniciar() {
   });
 
   document.querySelector('#today-label').textContent = dataExtensoHoje();
-  function alternarAcesso(modo) {
-    const cadastro = modo === 'register';
-    document.querySelector('#login-form').classList.toggle('hidden', cadastro);
-    document.querySelector('#register-form').classList.toggle('hidden', !cadastro);
-    document.querySelector('#show-login').setAttribute('aria-selected', String(!cadastro));
-    document.querySelector('#show-register').setAttribute('aria-selected', String(cadastro));
-    document.querySelector('#auth-description').textContent = cadastro
-      ? 'Crie sua conta para ter um histórico privado de consumo.'
-      : 'Entre para registrar as leituras do seu medidor.';
-    document.querySelector(cadastro ? '#register-username' : '#username').focus();
-  }
-  document.querySelector('#show-login').addEventListener('click', () => alternarAcesso('login'));
-  document.querySelector('#show-register').addEventListener('click', () => alternarAcesso('register'));
+  criarControleAcesso();
   document.querySelector('#login-form').addEventListener('submit', async (evento) => {
     evento.preventDefault();
     try {

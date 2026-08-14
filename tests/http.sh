@@ -60,14 +60,18 @@ grep -q '"residencia_id":2' "$resposta"
 id_alice=$(php -r '$d=json_decode(file_get_contents($argv[1]), true); echo $d["item"]["identificador"];' "$resposta")
 
 [[ $(requisitar "$cookie_bob" register POST '{"username":"BOB","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '201' ]]
+[[ $(requisitar "$diretorio_teste/duplicado.cookie" register POST '{"username":"bob","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '422' ]]
 [[ $(requisitar "$cookie_bob" entries GET '' "$resposta") == '200' ]]
 grep -q '"total":0' "$resposta"
 [[ $(requisitar "$cookie_bob" "update_entry&id=$id_alice" POST '{"date":"2026-08-14","shift":"morning","morning":"999"}' "$resposta") == '404' ]]
 [[ $(requisitar "$cookie_bob" "delete_entry&id=$id_alice" POST '{}' "$resposta") == '404' ]]
 [[ $(requisitar "$cookie_bob" export GET '' "$resposta") == '200' ]]
 if grep -q '2026-08-14' "$resposta"; then exit 1; fi
+[[ $(requisitar "$cookie_alice" "update_entry&id=$id_alice" POST '{"date":"2026-08-14","shift":"morning","morning":"101"}' "$resposta") == '200' ]]
+[[ $(requisitar "$cookie_alice" "delete_entry&id=$id_alice" POST '{}' "$resposta") == '200' ]]
 
 [[ $(requisitar "$cookie_legado" login POST '{"username":"LEGADO","password":"incorreta"}' "$resposta") == '401' ]]
+grep -q '"message":"Usuário ou senha inválidos."' "$resposta"
 [[ $(requisitar "$cookie_legado" login POST '{"username":"LEGADO","password":"senha-legada"}' "$resposta") == '200' ]]
 [[ $(requisitar "$cookie_legado" entries GET '' "$resposta") == '200' ]]
 grep -q '"total":2' "$resposta"

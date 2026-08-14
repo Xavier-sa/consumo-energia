@@ -98,6 +98,6 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
       </div>
     </div>
   </main>
-  <script type="module" src="assets/js/app.js?v=20260814-2"></script>
+  <script type="module" src="assets/js/app.js?v=20260814-3"></script>
 </body>
 </html>
