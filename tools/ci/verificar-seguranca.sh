@@ -49,10 +49,7 @@ fi
 echo "Verificando credencial do modelo..."
 php -r '
 $usuarios = json_decode(file_get_contents("data/usuarios.exemplo.json"), true);
-if (!is_array($usuarios) || count($usuarios) !== 1) exit(1);
-if (($usuarios[0]["password"] ?? "") !== "ALTERE_ESTA_SENHA") exit(1);
-if (($usuarios[0]["accesses"] ?? null) !== []) exit(1);
-if (!array_key_exists("last_ip", $usuarios[0]) || $usuarios[0]["last_ip"] !== null) exit(1);
+if (!is_array($usuarios) || $usuarios !== []) exit(1);
 ' || falhar "usuarios.exemplo.json deve permanecer sanitizado."
 
 echo "Verificações de segurança concluídas."

@@ -15,6 +15,9 @@ while IFS= read -r -d '' arquivo; do
   node --experimental-default-type=module --check "$arquivo"
 done < <(find public/assets/js -type f -name '*.js' -print0)
 
+echo "Executando testes da aplicação..."
+php tests/executar.php
+
 echo "Verificando JSONs versionáveis..."
 php -r '
 foreach (glob("data/*.exemplo.json") as $arquivo) {

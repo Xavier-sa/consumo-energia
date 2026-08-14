@@ -7,9 +7,15 @@ do medidor com o horário do registro.
 O projeto utiliza PHP puro, JavaScript com módulos ES, CSS e arquivos JSON. Não
 é necessário instalar Composer, Node.js, banco de dados ou dependências externas.
 
+## Aplicação online
+
+Acesse: [consumo-energisa.wasxtech.com.br](https://consumo-energisa.wasxtech.com.br/public/)
+
 ## Recursos
 
 - Autenticação com sessão PHP.
+- Cadastro de contas com senhas protegidas.
+- Histórico privado e isolado por residência.
 - Registro das leituras da manhã e da noite.
 - Cálculo automático do consumo diário.
 - Fotos opcionais para cada período.
@@ -44,13 +50,12 @@ Na primeira execução, o sistema cria automaticamente:
 - `data/usuarios.json`, usando `data/usuarios.exemplo.json` como modelo.
 - `data/consumo.json`, usando `data/consumo.exemplo.json` como modelo.
 
-As credenciais iniciais do arquivo de exemplo são:
+O arquivo de usuários começa vazio. Use **Criar conta** na página inicial para
+cadastrar o primeiro acesso. Cada nova conta recebe um histórico privado.
 
-- Usuário: `USUARIO`
-- Senha: `ALTERE_ESTA_SENHA`
-
-Altere essas credenciais em `data/usuarios.json` antes de disponibilizar o
-sistema na internet.
+Instalações antigas continuam aceitando os usuários existentes. No primeiro
+login válido, senhas legadas são convertidas automaticamente para um hash
+seguro, sem apagar as leituras já registradas.
 
 ## Publicar em uma hospedagem
 
@@ -166,7 +171,7 @@ e armazena a imagem em `public/uploads/`.
 
 Antes de publicar:
 
-1. Altere o usuário e a senha padrão em `data/usuarios.json`.
+1. Crie a primeira conta pela interface e use uma senha exclusiva.
 2. Confirme que os arquivos JSON reais não estão no Git.
 3. Configure `public/` como raiz pública, quando possível.
 4. Restrinja o acesso direto ao diretório `data/`.
@@ -174,9 +179,9 @@ Antes de publicar:
 6. Ative HTTPS no domínio.
 7. Faça cópias de segurança periódicas de `data/` e `public/uploads/`.
 
-> A versão atual armazena senhas em texto simples. Para uma publicação exposta
-> a usuários externos, migre as senhas para `password_hash()` e
-> `password_verify()` antes de usar o sistema em produção.
+As senhas são armazenadas com `password_hash()` e verificadas com
+`password_verify()`. Nunca publique os arquivos JSON reais ou endereços de
+webhooks de deploy.
 
 ## Integração contínua
 
@@ -184,7 +189,7 @@ O workflow `.github/workflows/ci.yml` executa automaticamente em cada envio e
 pull request. Ele possui dois jobs:
 
 - **Padrão e integridade:** valida PHP, JavaScript, JSON, conflitos, espaços
-  finais e arquivos obsoletos.
+  finais, arquivos obsoletos e os testes automatizados.
 - **Segurança e dados sensíveis:** impede JSONs reais, fotos, segredos, scripts
   em uploads, JavaScript perigoso e credenciais não sanitizadas no exemplo.
 
@@ -222,8 +227,8 @@ Confirme que:
 
 ### O login não funciona
 
-Confira os valores de `username` e `password` em `data/usuarios.json`. O arquivo
-é criado automaticamente somente quando ainda não existe.
+Use **Criar conta** se a instalação ainda não tiver usuários. Em instalações
+antigas, confira o `username`; a senha legada será protegida no primeiro login.
 
 ## Licença
 
