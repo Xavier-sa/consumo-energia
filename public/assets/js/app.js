@@ -1,13 +1,15 @@
-import { api } from './api/cliente-api.js?v=20260814-2';
+import { api } from './api/cliente-api.js?v=20260814-4';
 import { criarControleAcesso } from './componentes/acesso.js?v=20260814-3';
 import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814-2';
 import { criarHistorico } from './componentes/historico.js?v=20260814-2';
+import { criarPainelAdmin } from './componentes/painel-admin.js?v=20260814-4';
 import { dataExtensoHoje, formatarData } from './utilitarios/datas.js';
 
 const limite = 8;
 let paginaAtual = 1;
 let formulario;
 let historico;
+let painelAdmin;
 
 function mostrarLogin() {
   document.querySelector('#login-view').classList.remove('hidden');
@@ -24,13 +26,15 @@ async function carregarLeituras(pagina = 1) {
 }
 
 function mostrarAplicacao(usuario) {
-  document.querySelector('#user-name').textContent = usuario;
+  document.querySelector('#user-name').textContent = usuario.username;
+  painelAdmin.configurarUsuario(usuario);
   document.querySelector('#login-view').classList.add('hidden');
   document.querySelector('#main-view').classList.remove('hidden');
   carregarLeituras();
 }
 
 async function iniciar() {
+  painelAdmin = criarPainelAdmin(api);
   formulario = criarFormularioLeitura(async (id, dados) => {
     id ? await api.atualizarLeitura(id, dados) : await api.criarLeitura(dados);
     await carregarLeituras(id ? paginaAtual : 1);
@@ -53,7 +57,7 @@ async function iniciar() {
     try {
       const resposta = await api.entrar(document.querySelector('#username').value, document.querySelector('#password').value);
       document.querySelector('#login-error').textContent = '';
-      mostrarAplicacao(resposta.user.username);
+      mostrarAplicacao(resposta.user);
     } catch (erro) { document.querySelector('#login-error').textContent = erro.message; }
   });
   document.querySelector('#register-form').addEventListener('submit', async (evento) => {
@@ -64,7 +68,7 @@ async function iniciar() {
     try {
       const resposta = await api.cadastrar(usuario, senha, confirmacao);
       document.querySelector('#register-error').textContent = '';
-      mostrarAplicacao(resposta.user.username);
+      mostrarAplicacao(resposta.user);
     } catch (erro) { document.querySelector('#register-error').textContent = erro.message; }
   });
   document.querySelector('#btn-logout').addEventListener('click', async () => { await api.sair(); location.reload(); });
@@ -74,7 +78,7 @@ async function iniciar() {
 
   try {
     const resposta = await api.usuarioAtual();
-    resposta.user ? mostrarAplicacao(resposta.user.username) : mostrarLogin();
+    resposta.user ? mostrarAplicacao(resposta.user) : mostrarLogin();
   } catch { mostrarLogin(); }
 }
 

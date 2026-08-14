@@ -12,7 +12,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#174c3c">
   <title>Meu Consumo de Energia</title>
-  <link rel="stylesheet" href="assets/css/main.css?v=20260814-2">
+  <link rel="stylesheet" href="assets/css/main.css?v=20260814-4">
 </head>
 <body>
   <main id="app">
@@ -50,7 +50,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
     <div id="main-view" class="hidden">
       <header class="topbar"><div class="topbar-content">
         <div class="brand"><span class="brand-icon" aria-hidden="true">⚡</span><span>Meu Consumo</span></div>
-        <div class="user-area"><span class="user-greeting">Olá, <strong id="user-name"></strong></span><?php botao('Sair', 'btn-logout', 'ghost'); ?></div>
+        <div class="user-area"><span class="user-greeting">Olá, <strong id="user-name"></strong></span><?php botao('Painel admin', 'btn-admin', 'secondary', 'button', 'hidden'); ?><?php botao('Sair', 'btn-logout', 'ghost'); ?></div>
       </div></header>
 
       <div class="page-content">
@@ -97,7 +97,30 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
         </section>
       </div>
     </div>
+    <dialog id="admin-dialog" class="admin-dialog" aria-labelledby="admin-title">
+      <div class="admin-modal">
+        <header class="admin-header">
+          <div><p class="eyebrow">Visão geral</p><h2 id="admin-title">Painel administrativo</h2><p class="muted">Consulte usuários e registros de consumo.</p></div>
+          <button type="button" id="btn-close-admin" class="modal-close" aria-label="Fechar painel">×</button>
+        </header>
+        <p id="admin-message" class="message" role="status" aria-live="polite"></p>
+        <section aria-labelledby="admin-users-title">
+          <h3 id="admin-users-title">Usuários</h3>
+          <div class="table-wrap admin-table-wrap"><table id="admin-users-table">
+            <thead><tr><th>Usuário</th><th>Residência</th><th>Perfil</th><th>Registros</th><th>Último acesso</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </section>
+        <section class="admin-readings" aria-labelledby="admin-readings-title">
+          <div class="admin-section-heading"><h3 id="admin-readings-title">Leituras</h3><div><label for="admin-user-filter">Filtrar por usuário</label><select id="admin-user-filter"><option value="">Todos</option></select></div></div>
+          <div class="table-wrap admin-table-wrap"><table id="admin-readings-table">
+            <thead><tr><th>Usuário</th><th>Data</th><th>Manhã</th><th>Noite</th><th>Consumo</th></tr></thead>
+            <tbody></tbody>
+          </table></div>
+        </section>
+      </div>
+    </dialog>
   </main>
-  <script type="module" src="assets/js/app.js?v=20260814-3"></script>
+  <script type="module" src="assets/js/app.js?v=20260814-4"></script>
 </body>
 </html>
