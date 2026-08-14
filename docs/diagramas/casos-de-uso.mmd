@@ -1,0 +1,25 @@
+%% Diagrama: Casos de uso | Data: 2026-08-13
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#174c3c', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0c3026', 'lineColor': '#94a3b8', 'secondaryColor': '#10b981', 'tertiaryColor': '#f4b942', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#cbd5e1', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#e2e8f0', 'titleColor': '#18312a', 'edgeLabelBackground': '#ffffff', 'textColor': '#334155'}}}%%
+flowchart LR
+    usuario([Usuário])
+    administrador([Administrador da hospedagem])
+
+    subgraph sistema[Meu Consumo]
+        direction TB
+        autenticar[Autenticar-se]
+        registrar[Registrar leitura]
+        consultar[Consultar histórico]
+        editar[Editar leitura]
+        excluir[Excluir leitura]
+        exportar[Exportar CSV]
+        encerrar[Encerrar sessão]
+    end
+
+    usuario --> autenticar
+    usuario --> registrar
+    usuario --> consultar
+    usuario --> editar
+    usuario --> excluir
+    usuario --> exportar
+    usuario --> encerrar
+    administrador -->|Configura arquivos e permissões| sistema

@@ -1,0 +1,27 @@
+%% Diagrama: DER lógico do JSON atual | Data: 2026-08-13
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#174c3c', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0c3026', 'lineColor': '#94a3b8', 'secondaryColor': '#10b981', 'tertiaryColor': '#f4b942', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#cbd5e1', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#e2e8f0', 'titleColor': '#18312a', 'edgeLabelBackground': '#ffffff', 'textColor': '#334155'}}}%%
+erDiagram
+    USUARIO ||--o{ ACESSO : "contém"
+
+    USUARIO {
+        string username UK "Nome de acesso"
+        string password "Senha em texto simples"
+        string last_ip "Último IP ou nulo"
+    }
+
+    ACESSO {
+        datetime at "Data e hora ISO 8601"
+        string ip "Endereço IP"
+    }
+
+    LEITURA {
+        int identificador PK "Identificador local"
+        date data "Data da leitura"
+        int leitura_manha "Valor acumulado"
+        int leitura_noite "Valor acumulado"
+        int consumo "Noite menos manhã"
+        string foto_manha "Caminho ou nulo"
+        datetime horario_foto_manha "Horário ou nulo"
+        string foto_noite "Caminho ou nulo"
+        datetime horario_foto_noite "Horário ou nulo"
+    }

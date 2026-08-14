@@ -1,0 +1,29 @@
+%% Diagrama: Sequência do registro de leitura | Data: 2026-08-13
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#174c3c', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0c3026', 'lineColor': '#94a3b8', 'secondaryColor': '#10b981', 'tertiaryColor': '#f4b942', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#cbd5e1', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#e2e8f0', 'titleColor': '#18312a', 'edgeLabelBackground': '#ffffff', 'textColor': '#334155'}}}%%
+sequenceDiagram
+    autonumber
+    actor usuario as Usuário
+    participant interface as Formulário
+    participant api as API PHP
+    participant controlador as Controlador
+    participant servico as Serviço de leituras
+    participant dominio as Domínio Leitura
+    participant fotos as Gerenciador de fotos
+    participant json as Repositório JSON
+
+    usuario->>interface: Informa data, leituras e fotos
+    interface->>api: POST create_entry multipart/form-data
+    api->>api: Confirma sessão
+    api->>controlador: criar()
+    controlador->>servico: criar(dados)
+    servico->>dominio: validar(data, manhã, noite)
+    dominio-->>servico: Dados válidos
+    opt Existem fotos
+        servico->>fotos: salvar(fotos)
+        fotos-->>servico: Caminhos seguros
+    end
+    servico->>json: adicionar(leitura)
+    json-->>servico: Leitura persistida
+    servico-->>controlador: Leitura criada
+    controlador-->>interface: HTTP 200 e JSON
+    interface-->>usuario: Atualiza o histórico

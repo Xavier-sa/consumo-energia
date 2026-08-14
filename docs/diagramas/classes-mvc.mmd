@@ -1,0 +1,47 @@
+%% Diagrama: Classes principais MVC | Data: 2026-08-13
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#174c3c', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0c3026', 'lineColor': '#94a3b8', 'secondaryColor': '#10b981', 'tertiaryColor': '#f4b942', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#cbd5e1', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#e2e8f0', 'titleColor': '#18312a', 'edgeLabelBackground': '#ffffff', 'textColor': '#334155'}}}%%
+classDiagram
+    class Leitura {
+        +validar(data, manha, noite) void
+        +calcularConsumo(manha, noite) int
+    }
+    class ServicoLeituras {
+        +listar(pagina, limite) array
+        +criar(dados) array
+        +atualizar(id, dados) array
+        +excluir(id) bool
+        +todas() array
+    }
+    class ControladorLeituras {
+        +listar() void
+        +criar() void
+        +atualizar() void
+        +excluir() void
+        +exportar() void
+    }
+    class RepositorioJson {
+        #ler() array
+        #gravar(dados) void
+    }
+    class RepositorioLeituras {
+        +paginar(pagina, limite) array
+        +adicionar(leitura) array
+        +atualizar(id, alteracao) array
+        +excluir(id) array
+    }
+    class GerenciadorFotos {
+        +salvar(campo) string
+        +excluir(url) void
+    }
+    class ControladorAutenticacao
+    class ServicoAutenticacao
+    class RepositorioUsuarios
+
+    ControladorLeituras --> ServicoLeituras
+    ServicoLeituras ..> Leitura
+    ServicoLeituras --> RepositorioLeituras
+    ServicoLeituras --> GerenciadorFotos
+    RepositorioJson <|-- RepositorioLeituras
+    ControladorAutenticacao --> ServicoAutenticacao
+    ServicoAutenticacao --> RepositorioUsuarios
+    RepositorioJson <|-- RepositorioUsuarios

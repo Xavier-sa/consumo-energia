@@ -1,0 +1,52 @@
+%% Diagrama: DER relacional recomendado | Data: 2026-08-13
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#174c3c', 'primaryTextColor': '#ffffff', 'primaryBorderColor': '#0c3026', 'lineColor': '#94a3b8', 'secondaryColor': '#10b981', 'tertiaryColor': '#f4b942', 'background': '#ffffff', 'mainBkg': '#f8fafc', 'nodeBorder': '#cbd5e1', 'clusterBkg': '#f1f5f9', 'clusterBorder': '#e2e8f0', 'titleColor': '#18312a', 'edgeLabelBackground': '#ffffff', 'textColor': '#334155'}}}%%
+erDiagram
+    USUARIO ||--o{ ACESSO : "realiza"
+    USUARIO ||--o{ LEITURA : "registra"
+    UNIDADE_CONSUMIDORA ||--|{ MEDIDOR : "possui"
+    MEDIDOR ||--o{ LEITURA : "recebe"
+    LEITURA ||--o{ FOTO_LEITURA : "comprova"
+
+    USUARIO {
+        bigint id PK
+        string nome UK
+        string senha_hash
+        boolean ativo
+        datetime criado_em
+    }
+    ACESSO {
+        bigint id PK
+        bigint usuario_id FK
+        string ip
+        datetime acessado_em
+    }
+    UNIDADE_CONSUMIDORA {
+        bigint id PK
+        string nome
+        string numero_cliente UK
+        boolean ativa
+    }
+    MEDIDOR {
+        bigint id PK
+        bigint unidade_id FK
+        string numero_serie UK
+        boolean ativo
+    }
+    LEITURA {
+        bigint id PK
+        bigint medidor_id FK
+        bigint usuario_id FK
+        date data
+        int leitura_manha
+        int leitura_noite
+        int consumo
+        datetime criado_em
+        datetime atualizado_em
+    }
+    FOTO_LEITURA {
+        bigint id PK
+        bigint leitura_id FK
+        string periodo
+        string caminho
+        datetime fotografada_em
+    }

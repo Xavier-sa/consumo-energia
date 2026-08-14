@@ -132,6 +132,14 @@ JSON reais. Na próxima execução, o sistema recria os arquivos usando os model
 └── index.php                  # Entrada para hospedagens simples
 ```
 
+## Documentação de engenharia
+
+Os documentos de análise e modelagem ficam em [`docs/`](docs/README.md):
+
+- [Levantamento de requisitos](docs/requisitos.md).
+- [Modelo de dados e DER](docs/modelo-de-dados.md).
+- [Modelagem UML](docs/uml.md).
+
 ## Organização MVC
 
 - **Model:** `app/Dominio`, `app/Aplicacao` e `app/Infraestrutura` concentram
@@ -169,6 +177,26 @@ Antes de publicar:
 > A versão atual armazena senhas em texto simples. Para uma publicação exposta
 > a usuários externos, migre as senhas para `password_hash()` e
 > `password_verify()` antes de usar o sistema em produção.
+
+## Integração contínua
+
+O workflow `.github/workflows/ci.yml` executa automaticamente em cada envio e
+pull request. Ele possui dois jobs:
+
+- **Padrão e integridade:** valida PHP, JavaScript, JSON, conflitos, espaços
+  finais e arquivos obsoletos.
+- **Segurança e dados sensíveis:** impede JSONs reais, fotos, segredos, scripts
+  em uploads, JavaScript perigoso e credenciais não sanitizadas no exemplo.
+
+Execute as mesmas verificações antes de enviar alterações:
+
+```bash
+bash tools/ci/verificar-padrao.sh
+bash tools/ci/verificar-seguranca.sh
+```
+
+Configure a proteção da branch principal no GitHub para exigir os checks
+**Padrão e integridade** e **Segurança e dados sensíveis** antes do merge.
 
 ## Solução de problemas
 
