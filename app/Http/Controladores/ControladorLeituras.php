@@ -18,17 +18,17 @@ final class ControladorLeituras
 
     public function listar(): void
     {
-        Resposta::json($this->servico->listar((int) ($_GET['page'] ?? 1), (int) ($_GET['limit'] ?? 10)));
+        Resposta::json($this->servico->listar((int) ($_GET['page'] ?? 1), (int) ($_GET['limit'] ?? 10), $this->residenciaId()));
     }
 
     public function criar(): void
     {
-        Resposta::json(['ok' => true, 'item' => $this->servico->criar(Requisicao::corpo())]);
+        Resposta::json(['ok' => true, 'item' => $this->servico->criar(Requisicao::corpo(), $this->residenciaId())]);
     }
 
     public function atualizar(): void
     {
-        $leitura = $this->servico->atualizar((int) ($_GET['id'] ?? 0), Requisicao::corpo());
+        $leitura = $this->servico->atualizar((int) ($_GET['id'] ?? 0), Requisicao::corpo(), $this->residenciaId());
         if (!$leitura) {
             Resposta::json(['message' => 'Leitura não encontrada.'], 404);
             return;
@@ -38,7 +38,7 @@ final class ControladorLeituras
 
     public function excluir(): void
     {
-        if (!$this->servico->excluir((int) ($_GET['id'] ?? 0))) {
+        if (!$this->servico->excluir((int) ($_GET['id'] ?? 0), $this->residenciaId())) {
             Resposta::json(['message' => 'Leitura não encontrada.'], 404);
             return;
         }
@@ -47,6 +47,11 @@ final class ControladorLeituras
 
     public function exportar(): void
     {
-        Resposta::csv($this->servico->todas());
+        Resposta::csv($this->servico->todas($this->residenciaId()));
+    }
+
+    private function residenciaId(): int
+    {
+        return (int) ($_SESSION['user']['residencia_id'] ?? 1);
     }
 }

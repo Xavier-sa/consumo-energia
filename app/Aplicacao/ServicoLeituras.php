@@ -18,34 +18,34 @@ final class ServicoLeituras
         $this->fotos = $fotos;
     }
 
-    public function listar(int $pagina, int $limite): array
+    public function listar(int $pagina, int $limite, int $residenciaId): array
     {
-        return $this->repositorio->paginar(max(1, $pagina), max(1, min(50, $limite)));
+        return $this->repositorio->paginar(max(1, $pagina), max(1, min(50, $limite)), $residenciaId);
     }
 
-    public function criar(array $dados): array
+    public function criar(array $dados, int $residenciaId): array
     {
         [$data, $turno, $manha, $noite] = $this->dadosBasicos($dados);
-        $existente = $this->repositorio->encontrarPorData($data);
+        $existente = $this->repositorio->encontrarPorData($data, $residenciaId);
         if ($existente) {
             $turnoPreenchido = $turno === 'morning' ? ($existente['leitura_manha'] ?? null) : ($existente['leitura_noite'] ?? null);
             if ($turnoPreenchido !== null) {
                 throw new \DomainException('Esse turno já foi registrado nessa data. Use Editar para alterá-lo.');
             }
-            return $this->atualizar((int) $existente['identificador'], $dados);
+            return $this->atualizar((int) $existente['identificador'], $dados, $residenciaId);
         }
 
         $fotoManha = $turno === 'morning' ? $this->fotos->salvar('morning_photo') : null;
         try {
             $fotoNoite = $turno === 'night' ? $this->fotos->salvar('night_photo') : null;
-            return $this->repositorio->adicionar($this->montar($data, $manha, $noite, $fotoManha, $fotoNoite, $dados));
+            return $this->repositorio->adicionar($this->montar($data, $manha, $noite, $fotoManha, $fotoNoite, $dados), $residenciaId);
         } catch (\Throwable $erro) {
             $this->fotos->excluir($fotoManha);
             throw $erro;
         }
     }
 
-    public function atualizar(int $id, array $dados): ?array
+    public function atualizar(int $id, array $dados, int $residenciaId): ?array
     {
         [$data, $turno, $manha, $noite] = $this->dadosBasicos($dados);
         $novaFotoManha = $turno === 'morning' ? $this->fotos->salvar('morning_photo') : null;
@@ -53,7 +53,7 @@ final class ServicoLeituras
         try {
             $novaFotoNoite = $turno === 'night' ? $this->fotos->salvar('night_photo') : null;
             $anterior = null;
-            $atualizada = $this->repositorio->atualizar($id, function (array $leitura) use ($data, $turno, $manha, $noite, $novaFotoManha, $novaFotoNoite, $dados, &$anterior): array {
+            $atualizada = $this->repositorio->atualizar($id, $residenciaId, function (array $leitura) use ($data, $turno, $manha, $noite, $novaFotoManha, $novaFotoNoite, $dados, &$anterior): array {
                 $anterior = $leitura;
                 $leitura['data'] = $data;
                 if ($turno === 'morning') $leitura['leitura_manha'] = $manha;
@@ -85,18 +85,18 @@ final class ServicoLeituras
         }
     }
 
-    public function excluir(int $id): bool
+    public function excluir(int $id, int $residenciaId): bool
     {
-        $leitura = $this->repositorio->excluir($id);
+        $leitura = $this->repositorio->excluir($id, $residenciaId);
         if (!$leitura) return false;
         $this->fotos->excluir($leitura['foto_manha'] ?? null);
         $this->fotos->excluir($leitura['foto_noite'] ?? null);
         return true;
     }
 
-    public function todas(): array
+    public function todas(int $residenciaId): array
     {
-        return $this->repositorio->todas();
+        return $this->repositorio->todas($residenciaId);
     }
 
     private function dadosBasicos(array $dados): array

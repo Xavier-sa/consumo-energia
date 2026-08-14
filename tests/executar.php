@@ -1,0 +1,101 @@
+<?php
+declare(strict_types=1);
+
+require dirname(__DIR__) . '/bootstrap.php';
+
+use App\Aplicacao\ServicoAutenticacao;
+use App\Aplicacao\ServicoLeituras;
+use App\Infraestrutura\Arquivos\GerenciadorFotos;
+use App\Infraestrutura\Persistencia\RepositorioLeituras;
+use App\Infraestrutura\Persistencia\RepositorioUsuarios;
+
+function afirmar(bool $condicao, string $mensagem): void
+{
+    if (!$condicao) throw new RuntimeException($mensagem);
+}
+
+function executar(string $nome, callable $teste): void
+{
+    $teste();
+    echo "✓ {$nome}\n";
+}
+
+$base = sys_get_temp_dir() . '/consumo-energisa-' . bin2hex(random_bytes(6));
+mkdir($base, 0700, true);
+$usuariosArquivo = $base . '/usuarios.json';
+$leiturasArquivo = $base . '/consumo.json';
+file_put_contents($usuariosArquivo, json_encode([
+    ['username' => 'DARA', 'password' => 'senha-legada', 'accesses' => []],
+    ['username' => 'XAVIER', 'password' => 'outra-senha', 'accesses' => []],
+]));
+file_put_contents($leiturasArquivo, json_encode([
+    ['identificador' => 1, 'data' => '2026-08-13', 'leitura_manha' => 515, 'leitura_noite' => 518, 'consumo' => 3],
+    ['identificador' => 2, 'residencia_id' => 2, 'data' => '2026-08-13', 'leitura_manha' => 100, 'leitura_noite' => null, 'consumo' => null],
+]));
+
+try {
+    $autenticacao = new ServicoAutenticacao(new RepositorioUsuarios($usuariosArquivo));
+
+    executar('login legado preserva a residência inicial e converte a senha', function () use ($autenticacao, $usuariosArquivo): void {
+        $sessao = $autenticacao->entrar('dara', 'senha-legada', '127.0.0.1');
+        afirmar(($sessao['residencia_id'] ?? null) === 1, 'Usuário legado deveria pertencer à residência 1.');
+        $usuarios = json_decode((string) file_get_contents($usuariosArquivo), true);
+        afirmar(isset($usuarios[0]['password_hash']), 'A senha deveria ter sido convertida para hash.');
+        afirmar(!isset($usuarios[0]['password']), 'A senha em texto simples deveria ter sido removida.');
+        afirmar(password_verify('senha-legada', $usuarios[0]['password_hash']), 'O hash deveria validar a senha original.');
+    });
+
+    executar('cadastro cria conta em residência isolada', function () use ($autenticacao, $usuariosArquivo): void {
+        $sessao = $autenticacao->cadastrar('NOVA.PESSOA', 'senha-segura', '127.0.0.2');
+        afirmar(($sessao['residencia_id'] ?? null) === 2, 'A nova conta deveria receber a residência 2.');
+        $usuarios = json_decode((string) file_get_contents($usuariosArquivo), true);
+        $novo = $usuarios[count($usuarios) - 1];
+        afirmar(!isset($novo['password']), 'Cadastro não deve armazenar senha em texto simples.');
+        afirmar(password_verify('senha-segura', $novo['password_hash']), 'Cadastro deve armazenar um hash válido.');
+    });
+
+    executar('cadastro duplicado é rejeitado sem gravar usuário', function () use ($autenticacao, $usuariosArquivo): void {
+        $quantidade = count(json_decode((string) file_get_contents($usuariosArquivo), true));
+        try {
+            $autenticacao->cadastrar('nova.pessoa', 'outra-senha', '127.0.0.3');
+            afirmar(false, 'O cadastro duplicado deveria falhar.');
+        } catch (DomainException $erro) {
+            afirmar($erro->getMessage() === 'Não foi possível criar a conta com esses dados.', 'A falha deveria usar mensagem genérica.');
+        }
+        afirmar(count(json_decode((string) file_get_contents($usuariosArquivo), true)) === $quantidade, 'Cadastro duplicado não deve alterar o JSON.');
+    });
+
+    $leituras = new ServicoLeituras(
+        new RepositorioLeituras($leiturasArquivo),
+        new GerenciadorFotos($base . '/uploads', 'uploads/')
+    );
+
+    executar('leituras legadas pertencem somente à residência inicial', function () use ($leituras): void {
+        $inicial = $leituras->listar(1, 10, 1);
+        $nova = $leituras->listar(1, 10, 2);
+        afirmar($inicial['total'] === 1 && $inicial['data'][0]['identificador'] === 1, 'A residência inicial deveria ver o dado legado.');
+        afirmar($nova['total'] === 1 && $nova['data'][0]['identificador'] === 2, 'A residência 2 deveria ver apenas seu dado.');
+    });
+
+    executar('alteração e exclusão cruzadas são bloqueadas', function () use ($leituras): void {
+        $alterada = $leituras->atualizar(1, ['date' => '2026-08-13', 'shift' => 'night', 'night' => '519'], 2);
+        afirmar($alterada === null, 'Outra residência não deveria atualizar a leitura.');
+        afirmar($leituras->excluir(1, 2) === false, 'Outra residência não deveria excluir a leitura.');
+        afirmar($leituras->listar(1, 10, 1)['data'][0]['leitura_noite'] === 518, 'O dado legado deveria permanecer intacto.');
+    });
+
+    executar('nova leitura recebe a residência da sessão', function () use ($leituras): void {
+        $criada = $leituras->criar(['date' => '2026-08-14', 'shift' => 'morning', 'morning' => '521'], 2);
+        afirmar($criada['residencia_id'] === 2, 'A leitura deveria receber a residência 2.');
+        afirmar($leituras->listar(1, 10, 1)['total'] === 1, 'A residência inicial não deveria ver a nova leitura.');
+        afirmar($leituras->listar(1, 10, 2)['total'] === 2, 'A residência 2 deveria ver a nova leitura.');
+    });
+
+    echo "Todos os testes passaram.\n";
+} finally {
+    foreach (glob($base . '/uploads/*') ?: [] as $arquivo) unlink($arquivo);
+    if (is_dir($base . '/uploads')) rmdir($base . '/uploads');
+    if (is_file($usuariosArquivo)) unlink($usuariosArquivo);
+    if (is_file($leiturasArquivo)) unlink($leiturasArquivo);
+    if (is_dir($base)) rmdir($base);
+}

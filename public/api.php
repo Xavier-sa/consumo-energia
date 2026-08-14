@@ -24,7 +24,7 @@ $leituras = new ControladorLeituras(
 );
 
 $acao = $_GET['action'] ?? '';
-$rotasPublicas = ['login', 'me'];
+$rotasPublicas = ['login', 'register', 'me'];
 if (!in_array($acao, $rotasPublicas, true) && !isset($_SESSION['user'])) {
     Resposta::json(['message' => 'Sua sessão expirou. Entre novamente.'], 401);
     exit;
@@ -33,6 +33,7 @@ if (!in_array($acao, $rotasPublicas, true) && !isset($_SESSION['user'])) {
 try {
     switch ($acao) {
         case 'login': $autenticacao->entrar(); break;
+        case 'register': $autenticacao->cadastrar(); break;
         case 'logout': $autenticacao->sair(); break;
         case 'me': $autenticacao->usuarioAtual(); break;
         case 'entries': $leituras->listar(); break;

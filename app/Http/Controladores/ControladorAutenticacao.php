@@ -30,8 +30,23 @@ final class ControladorAutenticacao
             Resposta::json(['message' => 'Usuário ou senha inválidos.'], 401);
             return;
         }
+        session_regenerate_id(true);
         $_SESSION['user'] = $usuario;
         Resposta::json(['ok' => true, 'user' => $usuario]);
+    }
+
+    public function cadastrar(): void
+    {
+        $dados = Requisicao::corpo();
+        $senha = (string) ($dados['password'] ?? '');
+        if ($senha !== (string) ($dados['password_confirmation'] ?? '')) {
+            Resposta::json(['message' => 'A confirmação da senha não confere.'], 422);
+            return;
+        }
+        $usuario = $this->servico->cadastrar((string) ($dados['username'] ?? ''), $senha, Requisicao::ip());
+        session_regenerate_id(true);
+        $_SESSION['user'] = $usuario;
+        Resposta::json(['ok' => true, 'user' => $usuario], 201);
     }
 
     public function sair(): void

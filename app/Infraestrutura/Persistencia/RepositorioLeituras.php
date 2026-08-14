@@ -5,9 +5,9 @@ namespace App\Infraestrutura\Persistencia;
 
 final class RepositorioLeituras extends RepositorioJson
 {
-    public function paginar(int $pagina, int $limite): array
+    public function paginar(int $pagina, int $limite, int $residenciaId): array
     {
-        $leituras = $this->ler();
+        $leituras = array_values(array_filter($this->ler(), fn(array $leitura): bool => $this->pertence($leitura, $residenciaId)));
         usort($leituras, fn(array $a, array $b): int => strcmp($b['data'], $a['data']));
         return [
             'data' => array_slice($leituras, ($pagina - 1) * $limite, $limite),
@@ -15,9 +15,9 @@ final class RepositorioLeituras extends RepositorioJson
         ];
     }
 
-    public function todas(): array
+    public function todas(int $residenciaId): array
     {
-        return $this->ler();
+        return array_values(array_filter($this->ler(), fn(array $leitura): bool => $this->pertence($leitura, $residenciaId)));
     }
 
     public function proximoIdentificador(array $leituras): int
@@ -26,28 +26,29 @@ final class RepositorioLeituras extends RepositorioJson
         return $ids ? max($ids) + 1 : 1;
     }
 
-    public function adicionar(array $leitura): array
+    public function adicionar(array $leitura, int $residenciaId): array
     {
         $leituras = $this->ler();
         $leitura['identificador'] = $this->proximoIdentificador($leituras);
+        $leitura['residencia_id'] = $residenciaId;
         $leituras[] = $leitura;
         $this->gravar($leituras);
         return $leitura;
     }
 
-    public function encontrarPorData(string $data): ?array
+    public function encontrarPorData(string $data, int $residenciaId): ?array
     {
         foreach ($this->ler() as $leitura) {
-            if (($leitura['data'] ?? '') === $data) return $leitura;
+            if (($leitura['data'] ?? '') === $data && $this->pertence($leitura, $residenciaId)) return $leitura;
         }
         return null;
     }
 
-    public function atualizar(int $id, callable $alteracao): ?array
+    public function atualizar(int $id, int $residenciaId, callable $alteracao): ?array
     {
         $leituras = $this->ler();
         foreach ($leituras as &$leitura) {
-            if (($leitura['identificador'] ?? 0) !== $id) continue;
+            if (($leitura['identificador'] ?? 0) !== $id || !$this->pertence($leitura, $residenciaId)) continue;
             $leitura = $alteracao($leitura);
             $this->gravar($leituras);
             return $leitura;
@@ -55,15 +56,20 @@ final class RepositorioLeituras extends RepositorioJson
         return null;
     }
 
-    public function excluir(int $id): ?array
+    public function excluir(int $id, int $residenciaId): ?array
     {
         $leituras = $this->ler();
         foreach ($leituras as $indice => $leitura) {
-            if (($leitura['identificador'] ?? 0) !== $id) continue;
+            if (($leitura['identificador'] ?? 0) !== $id || !$this->pertence($leitura, $residenciaId)) continue;
             array_splice($leituras, $indice, 1);
             $this->gravar($leituras);
             return $leitura;
         }
         return null;
+    }
+
+    private function pertence(array $leitura, int $residenciaId): bool
+    {
+        return (int) ($leitura['residencia_id'] ?? 1) === $residenciaId;
     }
 }
