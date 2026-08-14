@@ -48,7 +48,7 @@ function criarLinha(leitura, aoEditar, aoExcluir) {
   if (leitura.data < dataLocalISO()) linha.classList.add('past');
   const consumo = document.createElement('td');
   const consumoDestaque = document.createElement('strong');
-  consumoDestaque.textContent = `${leitura.consumo} kWh`;
+  consumoDestaque.textContent = leitura.consumo === null || leitura.consumo === undefined ? 'Aguardando' : `${leitura.consumo} kWh`;
   consumo.appendChild(consumoDestaque);
   const acoes = document.createElement('td');
   acoes.className = 'actions';
@@ -63,7 +63,8 @@ function criarLinha(leitura, aoEditar, aoExcluir) {
   excluir.textContent = 'Excluir';
   excluir.addEventListener('click', () => aoExcluir(leitura));
   acoes.append(editar, excluir);
-  linha.append(criarCelula(formatarData(leitura.data)), criarCelula(`${leitura.leitura_manha} kWh`), criarCelula(`${leitura.leitura_noite} kWh`), consumo, criarFotos(leitura), acoes);
+  const valor = (leituraTurno) => leituraTurno === null || leituraTurno === undefined ? '—' : `${leituraTurno} kWh`;
+  linha.append(criarCelula(formatarData(leitura.data)), criarCelula(valor(leitura.leitura_manha)), criarCelula(valor(leitura.leitura_noite)), consumo, criarFotos(leitura), acoes);
   return linha;
 }
 

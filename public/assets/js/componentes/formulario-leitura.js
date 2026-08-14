@@ -13,18 +13,19 @@ export function criarFormularioLeitura(aoSalvar) {
   }
 
   function atualizarConsumo() {
-    const manhaTexto = document.querySelector('#morning').value;
-    const noiteTexto = document.querySelector('#night').value;
-    const completo = manhaTexto !== '' && noiteTexto !== '';
-    const valido = completo && Number(noiteTexto) >= Number(manhaTexto);
-    document.querySelector('#preview-value').textContent = valido ? Number(noiteTexto) - Number(manhaTexto) : 0;
-    document.querySelector('#preview-hint').textContent = !completo ? 'Preencha as duas leituras' : valido ? 'Diferença entre noite e manhã' : 'A leitura da noite deve ser maior';
+    const turno = document.querySelector('input[name="shift"]:checked').value;
+    document.querySelector('.morning-field').classList.toggle('hidden-shift', turno !== 'morning');
+    document.querySelector('.night-field').classList.toggle('hidden-shift', turno !== 'night');
+    document.querySelector('#morning').disabled = turno !== 'morning';
+    document.querySelector('#night').disabled = turno !== 'night';
+    document.querySelector('#preview-hint').textContent = `Você está registrando somente o turno da ${turno === 'morning' ? 'manhã' : 'noite'}.`;
   }
 
   function limpar() {
     identificador = null;
     formulario.reset();
     document.querySelector('#date').value = dataLocalISO();
+    document.querySelector('input[name="shift"][value="morning"]').checked = true;
     document.querySelector('#form-mode').textContent = 'Nova leitura';
     document.querySelector('#entry-title').textContent = 'Registrar medidor';
     document.querySelector('#btn-save').textContent = 'Salvar leitura';
@@ -37,8 +38,10 @@ export function criarFormularioLeitura(aoSalvar) {
   function editar(leitura) {
     identificador = leitura.identificador;
     document.querySelector('#date').value = leitura.data;
-    document.querySelector('#morning').value = leitura.leitura_manha;
-    document.querySelector('#night').value = leitura.leitura_noite;
+    document.querySelector('#morning').value = leitura.leitura_manha ?? '';
+    document.querySelector('#night').value = leitura.leitura_noite ?? '';
+    const turnoInicial = leitura.leitura_manha !== null && leitura.leitura_manha !== undefined ? 'morning' : 'night';
+    document.querySelector(`input[name="shift"][value="${turnoInicial}"]`).checked = true;
     document.querySelector('#form-mode').textContent = 'Editando leitura';
     document.querySelector('#entry-title').textContent = formatarData(leitura.data);
     document.querySelector('#btn-save').textContent = 'Atualizar leitura';
@@ -50,13 +53,13 @@ export function criarFormularioLeitura(aoSalvar) {
   formulario.addEventListener('submit', async (evento) => {
     evento.preventDefault();
     const data = document.querySelector('#date').value;
-    const manha = document.querySelector('#morning').value;
-    const noite = document.querySelector('#night').value;
-    if (!data || manha === '' || noite === '') return mostrarMensagem('Preencha a data e as duas leituras.', 'error');
-    if (Number(manha) < 0 || Number(noite) < Number(manha)) return mostrarMensagem('A leitura da noite deve ser igual ou maior que a da manhã.', 'error');
+    const turno = document.querySelector('input[name="shift"]:checked').value;
+    const leitura = document.querySelector(`#${turno}`).value;
+    if (!data || leitura === '') return mostrarMensagem('Preencha a data e a leitura do turno escolhido.', 'error');
+    if (Number(leitura) < 0) return mostrarMensagem('A leitura não pode ser negativa.', 'error');
 
     const dados = new FormData();
-    dados.append('date', data); dados.append('morning', manha); dados.append('night', noite);
+    dados.append('date', data); dados.append('shift', turno); dados.append(turno, leitura);
     fotos.adicionarAoFormulario(dados);
     try {
       const estavaEditando = Boolean(identificador);
@@ -69,8 +72,10 @@ export function criarFormularioLeitura(aoSalvar) {
   });
   document.querySelector('#morning').addEventListener('input', atualizarConsumo);
   document.querySelector('#night').addEventListener('input', atualizarConsumo);
+  document.querySelectorAll('input[name="shift"]').forEach((campo) => campo.addEventListener('change', atualizarConsumo));
   document.querySelector('#btn-clear').addEventListener('click', limpar);
   document.querySelector('#date').value = dataLocalISO();
+  atualizarConsumo();
 
   return { editar, mostrarMensagem };
 }

@@ -41,7 +41,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
 
       <div class="page-content">
         <section class="page-heading">
-          <div><p class="eyebrow">Controle diário</p><h1>Consumo de energia</h1><p class="muted">Anote o medidor pela manhã e à noite. O consumo do dia é calculado para você.</p></div>
+          <div><p class="eyebrow">Controle diário</p><h1>Consumo de energia</h1><p class="muted">Registre cada turno no horário adequado. Ao completar manhã e noite, o consumo do dia é calculado para você.</p></div>
           <div class="today-pill"><span aria-hidden="true">📅</span> <span id="today-label"></span></div>
         </section>
 
@@ -52,14 +52,17 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
           </div>
           <form id="entry-form" novalidate>
             <div class="date-field"><label for="date">Data da leitura</label><input type="date" id="date" required></div>
+            <fieldset class="shift-selector">
+              <legend>Qual turno deseja registrar?</legend>
+              <label><input type="radio" name="shift" value="morning" checked><span>☀️ Manhã</span></label>
+              <label><input type="radio" name="shift" value="night"><span>🌙 Noite</span></label>
+            </fieldset>
             <div class="readings-grid">
               <?php campoLeitura('morning', '☀️', 'Leitura da manhã', '515'); ?>
-              <div class="reading-arrow" aria-hidden="true">→</div>
               <?php campoLeitura('night', '🌙', 'Leitura da noite', '518'); ?>
             </div>
             <div class="consumption-preview" aria-live="polite">
-              <div><span class="preview-label">Consumo do dia</span><small id="preview-hint">Preencha as duas leituras</small></div>
-              <strong><span id="preview-value">0</span> <small>kWh</small></strong>
+              <div><span class="preview-label">Registro por turno</span><small id="preview-hint">O consumo aparecerá quando os dois turnos estiverem registrados</small></div>
             </div>
             <p id="form-message" class="message" role="status" aria-live="polite"></p>
             <?php botao('Salvar leitura', 'btn-save', 'primary', 'submit', 'button-save'); ?>

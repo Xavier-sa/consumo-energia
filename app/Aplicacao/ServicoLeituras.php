@@ -25,10 +25,19 @@ final class ServicoLeituras
 
     public function criar(array $dados): array
     {
-        [$data, $manha, $noite] = $this->dadosBasicos($dados);
-        $fotoManha = $this->fotos->salvar('morning_photo');
+        [$data, $turno, $manha, $noite] = $this->dadosBasicos($dados);
+        $existente = $this->repositorio->encontrarPorData($data);
+        if ($existente) {
+            $turnoPreenchido = $turno === 'morning' ? ($existente['leitura_manha'] ?? null) : ($existente['leitura_noite'] ?? null);
+            if ($turnoPreenchido !== null) {
+                throw new \DomainException('Esse turno já foi registrado nessa data. Use Editar para alterá-lo.');
+            }
+            return $this->atualizar((int) $existente['identificador'], $dados);
+        }
+
+        $fotoManha = $turno === 'morning' ? $this->fotos->salvar('morning_photo') : null;
         try {
-            $fotoNoite = $this->fotos->salvar('night_photo');
+            $fotoNoite = $turno === 'night' ? $this->fotos->salvar('night_photo') : null;
             return $this->repositorio->adicionar($this->montar($data, $manha, $noite, $fotoManha, $fotoNoite, $dados));
         } catch (\Throwable $erro) {
             $this->fotos->excluir($fotoManha);
@@ -38,17 +47,19 @@ final class ServicoLeituras
 
     public function atualizar(int $id, array $dados): ?array
     {
-        [$data, $manha, $noite] = $this->dadosBasicos($dados);
-        $novaFotoManha = $this->fotos->salvar('morning_photo');
+        [$data, $turno, $manha, $noite] = $this->dadosBasicos($dados);
+        $novaFotoManha = $turno === 'morning' ? $this->fotos->salvar('morning_photo') : null;
+        $novaFotoNoite = null;
         try {
-            $novaFotoNoite = $this->fotos->salvar('night_photo');
+            $novaFotoNoite = $turno === 'night' ? $this->fotos->salvar('night_photo') : null;
             $anterior = null;
-            $atualizada = $this->repositorio->atualizar($id, function (array $leitura) use ($data, $manha, $noite, $novaFotoManha, $novaFotoNoite, $dados, &$anterior): array {
+            $atualizada = $this->repositorio->atualizar($id, function (array $leitura) use ($data, $turno, $manha, $noite, $novaFotoManha, $novaFotoNoite, $dados, &$anterior): array {
                 $anterior = $leitura;
                 $leitura['data'] = $data;
-                $leitura['leitura_manha'] = $manha;
-                $leitura['leitura_noite'] = $noite;
-                $leitura['consumo'] = Leitura::calcularConsumo($manha, $noite);
+                if ($turno === 'morning') $leitura['leitura_manha'] = $manha;
+                if ($turno === 'night') $leitura['leitura_noite'] = $noite;
+                Leitura::validar($data, $leitura['leitura_manha'] ?? null, $leitura['leitura_noite'] ?? null);
+                $leitura['consumo'] = Leitura::calcularConsumo($leitura['leitura_manha'] ?? null, $leitura['leitura_noite'] ?? null);
                 if ($novaFotoManha) {
                     $leitura['foto_manha'] = $novaFotoManha;
                     $leitura['horario_foto_manha'] = $this->horario($dados['morning_photo_time'] ?? null);
@@ -69,6 +80,7 @@ final class ServicoLeituras
             return $atualizada;
         } catch (\Throwable $erro) {
             $this->fotos->excluir($novaFotoManha);
+            $this->fotos->excluir($novaFotoNoite);
             throw $erro;
         }
     }
@@ -90,13 +102,17 @@ final class ServicoLeituras
     private function dadosBasicos(array $dados): array
     {
         $data = (string) ($dados['date'] ?? date('Y-m-d'));
-        $manha = (int) ($dados['morning'] ?? 0);
-        $noite = (int) ($dados['night'] ?? 0);
+        $turno = (string) ($dados['shift'] ?? '');
+        if (!in_array($turno, ['morning', 'night'], true)) {
+            throw new \DomainException('Escolha o turno da manhã ou da noite.');
+        }
+        $manha = $turno === 'morning' && array_key_exists('morning', $dados) ? (int) $dados['morning'] : null;
+        $noite = $turno === 'night' && array_key_exists('night', $dados) ? (int) $dados['night'] : null;
         Leitura::validar($data, $manha, $noite);
-        return [$data, $manha, $noite];
+        return [$data, $turno, $manha, $noite];
     }
 
-    private function montar(string $data, int $manha, int $noite, ?string $fotoManha, ?string $fotoNoite, array $dados): array
+    private function montar(string $data, ?int $manha, ?int $noite, ?string $fotoManha, ?string $fotoNoite, array $dados): array
     {
         return [
             'data' => $data,

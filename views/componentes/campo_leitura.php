@@ -12,7 +12,7 @@ function campoLeitura(string $periodo, string $icone, string $titulo, string $ex
         <div><label for="<?= $periodo ?>"><?= $titulo ?></label><small>Valor mostrado no medidor</small></div>
       </div>
       <div class="input-with-unit">
-        <input type="number" id="<?= $periodo ?>" min="0" step="1" inputmode="numeric" placeholder="Ex.: <?= $exemplo ?>" required>
+        <input type="number" id="<?= $periodo ?>" min="0" step="1" inputmode="numeric" placeholder="Ex.: <?= $exemplo ?>">
         <span>kWh</span>
       </div>
       <?php campoFoto($periodo, $rotuloFoto); ?>

@@ -35,6 +35,14 @@ final class RepositorioLeituras extends RepositorioJson
         return $leitura;
     }
 
+    public function encontrarPorData(string $data): ?array
+    {
+        foreach ($this->ler() as $leitura) {
+            if (($leitura['data'] ?? '') === $data) return $leitura;
+        }
+        return null;
+    }
+
     public function atualizar(int $id, callable $alteracao): ?array
     {
         $leituras = $this->ler();

@@ -20,8 +20,8 @@ final class Resposta
         fputcsv($saida, ['identificador', 'data', 'leitura_manha', 'leitura_noite', 'consumo']);
         foreach ($leituras as $leitura) {
             fputcsv($saida, [
-                $leitura['identificador'], $leitura['data'], $leitura['leitura_manha'],
-                $leitura['leitura_noite'], $leitura['consumo'],
+                $leitura['identificador'], $leitura['data'], $leitura['leitura_manha'] ?? '',
+                $leitura['leitura_noite'] ?? '', $leitura['consumo'] ?? '',
             ]);
         }
         fclose($saida);
