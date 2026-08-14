@@ -1,0 +1,16 @@
+# Dados locais e potencialmente sensíveis
+/data/usuarios.json
+/data/consumo.json
+/data/*.tmp
+
+# Fotos enviadas pelos usuários
+/public/uploads/*
+!/public/uploads/.htaccess
+!/public/uploads/.gitkeep
+
+# Arquivos locais do sistema e editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
