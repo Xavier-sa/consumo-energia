@@ -1,6 +1,6 @@
 import { api } from './api/cliente-api.js';
-import { criarFormularioLeitura } from './componentes/formulario-leitura.js';
-import { criarHistorico } from './componentes/historico.js';
+import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814';
+import { criarHistorico } from './componentes/historico.js?v=20260814';
 import { dataExtensoHoje, formatarData } from './utilitarios/datas.js';
 
 const limite = 8;

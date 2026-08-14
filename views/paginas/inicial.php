@@ -4,6 +4,11 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/componentes/botao.php';
 require_once dirname(__DIR__) . '/componentes/campo_foto.php';
 require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
+
+$arquivoCss = dirname(__DIR__, 2) . '/public/assets/css/main.css';
+$arquivoJs = dirname(__DIR__, 2) . '/public/assets/js/app.js';
+$versaoCss = (string) (filemtime($arquivoCss) ?: time());
+$versaoJs = (string) (filemtime($arquivoJs) ?: time());
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -12,7 +17,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#174c3c">
   <title>Meu Consumo de Energia</title>
-  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/main.css?v=<?= $versaoCss ?>">
 </head>
 <body>
   <main id="app">
@@ -84,6 +89,6 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
       </div>
     </div>
   </main>
-  <script type="module" src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/app.js?v=<?= $versaoJs ?>"></script>
 </body>
 </html>
