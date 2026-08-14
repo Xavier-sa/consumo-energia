@@ -1,0 +1,41 @@
+name: Integração contínua
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualidade:
+    name: Padrão e integridade
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Informar versões
+        run: |
+          php --version
+          node --version
+
+      - name: Verificar padrão
+        run: bash tools/ci/verificar-padrao.sh
+
+  seguranca:
+    name: Segurança e dados sensíveis
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Verificar segurança
+        run: bash tools/ci/verificar-seguranca.sh
