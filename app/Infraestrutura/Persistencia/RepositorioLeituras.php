@@ -20,6 +20,11 @@ final class RepositorioLeituras extends RepositorioJson
         return array_values(array_filter($this->ler(), fn(array $leitura): bool => $this->pertence($leitura, $residenciaId)));
     }
 
+    public function todasAdministracao(): array
+    {
+        return $this->ler();
+    }
+
     public function proximoIdentificador(array $leituras): int
     {
         $ids = array_column($leituras, 'identificador');

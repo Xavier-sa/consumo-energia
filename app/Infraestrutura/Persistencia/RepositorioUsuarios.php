@@ -19,6 +19,7 @@ final class RepositorioUsuarios extends RepositorioJson
 
             $usuario['identificador'] = (int) ($usuario['identificador'] ?? $this->proximoIdentificador($usuarios));
             $usuario['residencia_id'] = (int) ($usuario['residencia_id'] ?? 1);
+            $usuario['role'] = (string) ($usuario['role'] ?? (strcasecmp((string) $usuario['username'], 'XAVIER') === 0 ? 'admin' : 'user'));
             if (!isset($usuario['password_hash'])) {
                 $usuario['password_hash'] = password_hash($senha, PASSWORD_DEFAULT);
                 unset($usuario['password']);
@@ -47,6 +48,7 @@ final class RepositorioUsuarios extends RepositorioJson
             'username' => $nome,
             'password_hash' => password_hash($senha, PASSWORD_DEFAULT),
             'residencia_id' => $residencias ? max($residencias) + 1 : 1,
+            'role' => 'user',
             'last_ip' => $ip,
             'accesses' => [['at' => date('c'), 'ip' => $ip]],
         ];
@@ -67,6 +69,22 @@ final class RepositorioUsuarios extends RepositorioJson
             'identificador' => (int) $usuario['identificador'],
             'username' => (string) $usuario['username'],
             'residencia_id' => (int) $usuario['residencia_id'],
+            'role' => (string) ($usuario['role'] ?? 'user'),
         ];
+    }
+
+    public function listarAdministracao(): array
+    {
+        return array_map(function (array $usuario, int $indice): array {
+            $acessos = $usuario['accesses'] ?? [];
+            $ultimo = $acessos ? end($acessos) : null;
+            return [
+                'identificador' => (int) ($usuario['identificador'] ?? $indice + 1),
+                'username' => (string) ($usuario['username'] ?? ''),
+                'residencia_id' => (int) ($usuario['residencia_id'] ?? 1),
+                'role' => (string) ($usuario['role'] ?? (strcasecmp((string) ($usuario['username'] ?? ''), 'XAVIER') === 0 ? 'admin' : 'user')),
+                'ultimo_acesso' => is_array($ultimo) ? ($ultimo['at'] ?? null) : null,
+            ];
+        }, $this->ler(), array_keys($this->ler()));
     }
 }
