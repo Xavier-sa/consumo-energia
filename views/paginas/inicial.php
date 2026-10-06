@@ -12,12 +12,14 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#174c3c">
   <title>Meu Consumo de Energia</title>
-  <link rel="stylesheet" href="assets/css/main.css?v=20260814-4">
+  <link rel="icon" href="assets/images/icone-energia-consumo.jpeg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="assets/images/icone-energia-consumo.jpeg">
+  <link rel="stylesheet" href="assets/css/main.css?v=20261006-1">
 </head>
 <body>
   <main id="app">
     <section id="login-view" class="login-shell" aria-labelledby="login-title">
-      <div class="brand brand-login" aria-label="Meu Consumo"><span class="brand-icon" aria-hidden="true">⚡</span><span>Meu Consumo</span></div>
+      <div class="brand brand-login" aria-label="Meu Consumo"><img class="brand-icon" src="assets/images/icone-energia-consumo.jpeg" alt=""><span>Meu Consumo</span></div>
       <div class="login-card">
         <p class="eyebrow">Bem-vindo de volta</p>
         <h1 id="login-title">Acompanhe sua energia</h1>
@@ -49,7 +51,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
 
     <div id="main-view" class="hidden">
       <header class="topbar"><div class="topbar-content">
-        <div class="brand"><span class="brand-icon" aria-hidden="true">⚡</span><span>Meu Consumo</span></div>
+        <div class="brand"><img class="brand-icon" src="assets/images/icone-energia-consumo.jpeg" alt=""><span>Meu Consumo</span></div>
         <div class="user-area"><span class="user-greeting">Olá, <strong id="user-name"></strong></span><?php botao('Painel admin', 'btn-admin', 'secondary', 'button', 'hidden'); ?><?php botao('Sair', 'btn-logout', 'ghost'); ?></div>
       </div></header>
 
