@@ -1,7 +1,7 @@
 import { api } from './api/cliente-api.js?v=20260814-4';
 import { criarControleAcesso } from './componentes/acesso.js?v=20260814-3';
 import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814-2';
-import { criarHistorico } from './componentes/historico.js?v=20260814-2';
+import { criarHistorico } from './componentes/historico.js?v=20261006-1';
 import { criarPainelAdmin } from './componentes/painel-admin.js?v=20260814-4';
 import { dataExtensoHoje, formatarData } from './utilitarios/datas.js';
 

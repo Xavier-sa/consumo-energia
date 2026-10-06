@@ -91,6 +91,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
             <?php botao('↓ Exportar CSV', 'btn-export', 'secondary'); ?>
           </div>
           <div id="empty-state" class="empty-state hidden"><span aria-hidden="true">📋</span><h3>Nenhuma leitura registrada</h3><p>Seu histórico aparecerá aqui depois do primeiro registro.</p></div>
+          <p id="carousel-hint" class="carousel-hint"><span aria-hidden="true">↔</span> Arraste para ver outras leituras</p>
           <div id="table-wrap" class="table-wrap"><table id="entries-table">
             <thead><tr><th>Data</th><th>Manhã</th><th>Noite</th><th>Consumo</th><th>Fotos</th><th><span class="sr-only">Ações</span></th></tr></thead>
             <tbody></tbody>
@@ -123,6 +124,6 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
       </div>
     </dialog>
   </main>
-  <script type="module" src="assets/js/app.js?v=20260814-4"></script>
+  <script type="module" src="assets/js/app.js?v=20261006-1"></script>
 </body>
 </html>
