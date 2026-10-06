@@ -1,236 +1,187 @@
+<p align="center">
+  <img src="icone-energia-consumo.jpeg" width="150"
+       alt="Medidor de energia azul com um raio amarelo">
+</p>
+
 # Meu Consumo
 
-Aplicação web simples para registrar leituras de energia pela manhã e à noite.
-O sistema calcula o consumo diário, mantém um histórico e permite anexar fotos
-do medidor com o horário do registro.
-
-O projeto utiliza PHP puro, JavaScript com módulos ES, CSS e arquivos JSON. Não
-é necessário instalar Composer, Node.js, banco de dados ou dependências externas.
+Aplicação web para registrar leituras de medidores elétricos pela manhã e à
+noite, calcular o consumo diário e acompanhar o histórico de cada residência.
+O projeto funciona com PHP puro, JavaScript, CSS e arquivos JSON no servidor,
+sem banco de dados ou gerenciador de dependências.
 
 ## Aplicação online
 
-Acesse: [consumo-energisa.wasxtech.com.br](https://consumo-energisa.wasxtech.com.br/public/)
+Acesse a [aplicação Meu Consumo](https://consumo-energisa.wasxtech.com.br/public/).
 
-## Recursos
+## ⚡ Funcionalidades
 
-- Autenticação com sessão PHP.
-- Cadastro de contas com senhas protegidas.
-- Histórico privado e isolado por residência.
+- Criação de conta e autenticação com sessão PHP.
+- Armazenamento de senhas com hash seguro.
+- Separação dos históricos por residência.
 - Registro das leituras da manhã e da noite.
-- Cálculo automático do consumo diário.
-- Fotos opcionais para cada período.
-- Registro do horário das fotos.
+- Cálculo automático do consumo diário em kWh.
+- Envio opcional de fotos do medidor para cada turno.
 - Edição e exclusão de leituras.
-- Histórico paginado.
-- Exportação do histórico em CSV.
-- Interface responsiva para computador e celular.
-- Estrutura MVC com componentes reutilizáveis.
+- Histórico paginado e exportação em CSV.
+- Painel administrativo com usuários, leituras e filtro por residência.
+- Interface responsiva para computadores e dispositivos móveis.
+- Histórico em carrossel com navegação por toque na versão mobile.
 
-## Requisitos
+## 📸 Capturas de tela
+
+### Acesso
+
+![Tela de acesso com opções para entrar ou criar uma conta](docs/screenshots/acesso.png)
+
+### Registro e histórico de consumo
+
+![Painel com formulário de leitura e histórico de consumo](docs/screenshots/dashboard.png)
+
+### Histórico no celular
+
+<p align="center">
+  <img src="docs/screenshots/historico-mobile.png" width="375"
+       alt="Histórico de consumo no celular com cartões em carrossel e paginação">
+</p>
+
+No mobile, cada leitura aparece em um cartão com a data destacada. Você pode
+arrastar o histórico horizontalmente para navegar entre os registros da página.
+A paginação numérica continua disponível para acessar os demais grupos de
+leituras. Em telas maiores, o histórico mantém o formato de tabela.
+
+As imagens foram capturadas da aplicação em execução com dados de demonstração
+armazenados em uma cópia temporária dos arquivos JSON.
+
+## 🚀 Como executar
+
+### Pré-requisitos
 
 - PHP 7.4 ou superior.
 - Extensão PHP `fileinfo` habilitada para validar imagens.
 - Sessões PHP habilitadas.
-- Permissão de escrita nos arquivos de dados e no diretório de uploads.
-- Servidor Apache, Nginx ou hospedagem compatível com PHP.
+- Permissão de escrita em `data/` e `public/uploads/`.
 
-## Executar localmente
+O projeto não exige Composer, Node.js ou banco de dados para executar a
+aplicação.
+
+### Ambiente local
 
 1. Abra um terminal na raiz do projeto.
-2. Inicie o servidor PHP:
+2. Inicie o servidor de desenvolvimento do PHP:
 
    ```bash
    php -S localhost:8000 -t public
    ```
 
-3. Acesse `http://localhost:8000` no navegador.
+3. Acesse `http://localhost:8000`.
+4. Se ainda não houver um usuário, selecione **Criar conta** para cadastrar o
+   primeiro acesso.
 
-Na primeira execução, o sistema cria automaticamente:
+A aplicação não usa variáveis de ambiente. Os caminhos dos dados e uploads
+ficam definidos em `bootstrap.php`.
 
-- `data/usuarios.json`, usando `data/usuarios.exemplo.json` como modelo.
-- `data/consumo.json`, usando `data/consumo.exemplo.json` como modelo.
+### Hospedagem
 
-O arquivo de usuários começa vazio. Use **Criar conta** na página inicial para
-cadastrar o primeiro acesso. Cada nova conta recebe um histórico privado.
+Em produção, configure o documento raiz do Apache, Nginx ou servidor compatível
+com PHP para apontar para `public/`. Assim, `app/`, `data/`, `views/` e
+`bootstrap.php` permanecem fora do acesso público.
 
-Instalações antigas continuam aceitando os usuários existentes. No primeiro
-login válido, senhas legadas são convertidas automaticamente para um hash
-seguro, sem apagar as leituras já registradas.
+Se a hospedagem não permitir alterar a raiz pública, publique o projeto
+completo. O `index.php` da raiz encaminha o acesso para `public/`. Em servidores
+que não interpretam `.htaccess`, crie regras equivalentes para bloquear o
+acesso direto a `data/` e a execução de scripts em `public/uploads/`.
 
-## Publicar em uma hospedagem
+## 💾 Persistência dos dados
 
-### Opção recomendada: usar `public/` como raiz pública
+A aplicação persiste os dados em arquivos JSON no servidor:
 
-Configure o documento raiz do domínio para apontar para o diretório `public/`.
-Mantenha `app/`, `data/`, `views/` e `bootstrap.php` fora do acesso público.
+- `data/usuarios.json` armazena as contas e os dados de acesso necessários.
+- `data/consumo.json` armazena as leituras de energia.
 
-Essa configuração oferece a melhor proteção porque os arquivos JSON e o código
-interno não ficam acessíveis diretamente pelo navegador.
+Na primeira execução, `bootstrap.php` cria esses arquivos a partir de
+`data/usuarios.exemplo.json` e `data/consumo.exemplo.json`, caso eles ainda não
+existam. O usuário do processo PHP precisa ter permissão para criar e atualizar
+os arquivos.
 
-### Opção compatível: publicar o projeto completo
+Os JSONs reais fazem parte do funcionamento da instalação e não devem ser
+apagados nem tratados como arquivos temporários. Faça cópias de segurança antes
+de qualquer manutenção. A política existente do repositório mantém os arquivos
+reais fora do Git porque eles podem conter dados privados; os modelos
+sanitizados `*.exemplo.json` permanecem versionados.
 
-Se a hospedagem não permite alterar a raiz pública, envie todo o projeto para o
-diretório do domínio. O `index.php` da raiz encaminha o acesso para `public/`.
+Essa política de versionamento não muda a arquitetura: a aplicação continua
+lendo e gravando diretamente nos JSONs do servidor.
 
-Em servidores Apache, `data/.htaccess` bloqueia o acesso direto aos JSON, e
-`public/uploads/.htaccess` impede a execução de scripts enviados como arquivos.
-Em Nginx ou outro servidor, crie regras equivalentes antes de publicar.
+## 🛠 Tecnologias
 
-## Permissões de escrita
+- PHP 7.4+ para interface, API, sessões e regras da aplicação.
+- JavaScript com módulos ES para interação no navegador.
+- HTML5 e CSS3 para estrutura e apresentação responsiva.
+- JSON para persistência no servidor.
+- Apache `.htaccess` para proteção adicional de dados e uploads.
+- GitHub Actions para verificações de qualidade e segurança.
 
-O usuário que executa o PHP precisa gravar nestes locais:
-
-```text
-data/usuarios.json
-data/consumo.json
-public/uploads/
-```
-
-Se os JSON ainda não existirem, o PHP também precisa de permissão para criar
-arquivos dentro de `data/`.
-
-Evite conceder permissão `777`. Prefira definir o proprietário e o grupo usados
-pelo processo PHP e liberar somente a escrita necessária.
-
-## Dados locais e Git
-
-O `.gitignore` exclui do versionamento:
-
-- `data/usuarios.json`, que contém credenciais e histórico de acessos.
-- `data/consumo.json`, que contém as leituras reais.
-- Imagens armazenadas em `public/uploads/`.
-- Arquivos temporários, logs e configurações locais de editores.
-
-Os arquivos abaixo permanecem no repositório como modelos seguros:
-
-- `data/usuarios.exemplo.json`
-- `data/consumo.exemplo.json`
-- `public/uploads/.gitkeep`
-- `public/uploads/.htaccess`
-
-Para redefinir uma instalação local, faça uma cópia de segurança e remova os
-JSON reais. Na próxima execução, o sistema recria os arquivos usando os modelos.
-
-## Estrutura do projeto
+## 📁 Estrutura do projeto
 
 ```text
 .
 ├── app/
-│   ├── Aplicacao/             # Casos de uso e coordenação
-│   ├── Dominio/               # Regras de negócio
-│   ├── Http/                  # Requisição, resposta e controladores
-│   └── Infraestrutura/        # Persistência JSON e arquivos
-├── data/
-│   ├── consumo.exemplo.json
-│   └── usuarios.exemplo.json
+│   ├── Aplicacao/             # Casos de uso e serviços
+│   ├── Dominio/               # Entidades e regras de negócio
+│   ├── Http/                  # Requisições, respostas e controladores
+│   └── Infraestrutura/        # Repositórios JSON e fotos
+├── data/                      # JSONs persistentes e modelos sanitizados
+├── docs/
+│   ├── diagramas/             # Diagramas Mermaid e SVG
+│   └── screenshots/           # Capturas reais da interface
 ├── public/
-│   ├── assets/
-│   │   ├── css/               # Estilos da interface
-│   │   └── js/                # API, componentes e utilitários
-│   ├── uploads/               # Fotos enviadas
+│   ├── assets/                # CSS, JavaScript e identidade visual
+│   ├── uploads/               # Fotos enviadas pelos usuários
 │   ├── api.php                # Roteamento da API
 │   └── index.php              # Entrada pública da interface
-├── views/
-│   ├── componentes/           # Botões e campos reutilizáveis
-│   └── paginas/               # Composição das páginas
-├── bootstrap.php              # Autoload e configuração
+├── tests/                     # Testes PHP, HTTP e JavaScript
+├── tools/ci/                  # Verificações usadas pela CI
+├── views/                     # Páginas e componentes PHP
+├── bootstrap.php              # Autoload e configuração de caminhos
 └── index.php                  # Entrada para hospedagens simples
 ```
 
 ## Documentação de engenharia
 
-Os documentos de análise e modelagem ficam em [`docs/`](docs/README.md):
+Consulte o [índice da documentação](docs/README.md) para acessar:
 
 - [Levantamento de requisitos](docs/requisitos.md).
 - [Modelo de dados e DER](docs/modelo-de-dados.md).
 - [Modelagem UML](docs/uml.md).
 
-## Organização MVC
+## Fotos do medidor
 
-- **Model:** `app/Dominio`, `app/Aplicacao` e `app/Infraestrutura` concentram
-  regras, casos de uso e persistência.
-- **View:** `views/` organiza páginas e componentes PHP. Os componentes de
-  comportamento do navegador ficam em `public/assets/js/componentes`.
-- **Controller:** `app/Http/Controladores` recebe as ações HTTP e chama os
-  serviços da aplicação.
+O sistema aceita imagens JPEG, PNG e WebP de até 5 MB. O backend verifica o
+tipo real com `fileinfo`, gera um nome aleatório e salva o arquivo em
+`public/uploads/`.
 
-O arquivo `public/api.php` funciona como ponto de composição e roteador. Ele não
-contém regras de consumo nem acessa os JSON diretamente.
+## Qualidade e testes
 
-## Formatos aceitos para fotos
-
-- JPEG
-- PNG
-- WebP
-- Tamanho máximo de 5 MB por foto
-
-O backend confere o tipo real do arquivo com `fileinfo`, gera um nome aleatório
-e armazena a imagem em `public/uploads/`.
-
-## Segurança antes da publicação
-
-Antes de publicar:
-
-1. Crie a primeira conta pela interface e use uma senha exclusiva.
-2. Confirme que os arquivos JSON reais não estão no Git.
-3. Configure `public/` como raiz pública, quando possível.
-4. Restrinja o acesso direto ao diretório `data/`.
-5. Confirme que scripts não podem ser executados em `public/uploads/`.
-6. Ative HTTPS no domínio.
-7. Faça cópias de segurança periódicas de `data/` e `public/uploads/`.
-
-As senhas são armazenadas com `password_hash()` e verificadas com
-`password_verify()`. Nunca publique os arquivos JSON reais ou endereços de
-webhooks de deploy.
-
-## Integração contínua
-
-O workflow `.github/workflows/ci.yml` executa automaticamente em cada envio e
-pull request. Ele possui dois jobs:
-
-- **Padrão e integridade:** valida PHP, JavaScript, JSON, conflitos, espaços
-  finais, arquivos obsoletos e os testes automatizados.
-- **Segurança e dados sensíveis:** impede JSONs reais, fotos, segredos, scripts
-  em uploads, JavaScript perigoso e credenciais não sanitizadas no exemplo.
-
-Execute as mesmas verificações antes de enviar alterações:
+Execute as mesmas verificações usadas pela integração contínua:
 
 ```bash
 bash tools/ci/verificar-padrao.sh
 bash tools/ci/verificar-seguranca.sh
 ```
 
-Configure a proteção da branch principal no GitHub para exigir os checks
-**Padrão e integridade** e **Segurança e dados sensíveis** antes do merge.
+Esses scripts verificam sintaxe PHP e JavaScript, executam os testes da
+aplicação, validam os modelos JSON e procuram problemas de segurança.
 
-## Solução de problemas
+## Cuidados antes da publicação
 
-### A página abre sem estilos
-
-Confirme que `public/assets/css/main.css` foi enviado e que o domínio aponta para
-o diretório correto.
-
-### O sistema não cria os JSON
-
-Conceda ao processo PHP permissão de escrita em `data/` e confirme que os
-arquivos `.exemplo.json` existem.
-
-### A foto não é enviada
-
-Confirme que:
-
-- A extensão PHP `fileinfo` está habilitada.
-- `public/uploads/` permite escrita pelo PHP.
-- A imagem está em JPEG, PNG ou WebP.
-- A imagem tem no máximo 5 MB.
-- Os limites `upload_max_filesize` e `post_max_size` do PHP aceitam 5 MB.
-
-### O login não funciona
-
-Use **Criar conta** se a instalação ainda não tiver usuários. Em instalações
-antigas, confira o `username`; a senha legada será protegida no primeiro login.
+1. Use senhas exclusivas para as contas.
+2. Mantenha os JSONs reais protegidos contra acesso público.
+3. Garanta permissão de escrita somente para o processo PHP.
+4. Impeça a execução de scripts em `public/uploads/`.
+5. Ative HTTPS no domínio.
+6. Faça cópias de segurança de `data/` e `public/uploads/`.
 
 ## Licença
 
 Este projeto ainda não possui uma licença definida.
-# consumo-energia
