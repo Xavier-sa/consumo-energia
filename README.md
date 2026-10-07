@@ -155,6 +155,18 @@ Consulte o [índice da documentação](docs/README.md) para acessar:
 - [Modelo de dados e DER](docs/modelo-de-dados.md).
 - [Modelagem UML](docs/uml.md).
 
+## Documentos do projeto
+
+- [Como contribuir](CONTRIBUTING.md).
+- [Termos de Uso](TERMS.md).
+- [Política de Privacidade](PRIVACY.md).
+- [Licença MIT](LICENSE).
+
+O projeto adota práticas voltadas à transparência, minimização de dados e
+proteção dos direitos dos titulares. A conformidade jurídica completa também
+depende dos processos, da infraestrutura e da identificação do responsável por
+cada instalação.
+
 ## Fotos do medidor
 
 O sistema aceita imagens JPEG, PNG e WebP de até 5 MB. O backend verifica o
@@ -184,4 +196,6 @@ aplicação, validam os modelos JSON e procuram problemas de segurança.
 
 ## Licença
 
-Este projeto ainda não possui uma licença definida.
+Este projeto é distribuído sob a [Licença MIT](LICENSE). Você pode usar,
+copiar, modificar e distribuir o código, desde que preserve o aviso de
+copyright e o texto da licença, mantendo o crédito a Wellington Xavier.
