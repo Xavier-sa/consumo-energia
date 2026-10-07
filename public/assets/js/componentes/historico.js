@@ -1,14 +1,16 @@
 import { dataLocalISO, formatarData, formatarHora } from '../utilitarios/datas.js';
 
-function criarCelula(texto) {
+function criarCelula(texto, rotulo) {
   const celula = document.createElement('td');
   celula.textContent = texto;
+  celula.dataset.label = rotulo;
   return celula;
 }
 
 function criarFotos(leitura) {
   const celula = document.createElement('td');
   celula.className = 'photo-links';
+  celula.dataset.label = 'Fotos';
   const fotos = [
     { url: leitura.foto_manha, hora: leitura.horario_foto_manha, rotulo: 'Manhã', icone: '☀️' },
     { url: leitura.foto_noite, hora: leitura.horario_foto_noite, rotulo: 'Noite', icone: '🌙' },
@@ -47,11 +49,13 @@ function criarLinha(leitura, aoEditar, aoExcluir) {
   const linha = document.createElement('tr');
   if (leitura.data < dataLocalISO()) linha.classList.add('past');
   const consumo = document.createElement('td');
+  consumo.dataset.label = 'Consumo';
   const consumoDestaque = document.createElement('strong');
   consumoDestaque.textContent = leitura.consumo === null || leitura.consumo === undefined ? 'Aguardando' : `${leitura.consumo} kWh`;
   consumo.appendChild(consumoDestaque);
   const acoes = document.createElement('td');
   acoes.className = 'actions';
+  acoes.dataset.label = 'Ações';
   const editar = document.createElement('button');
   editar.className = 'action-button edit';
   editar.type = 'button';
@@ -64,7 +68,14 @@ function criarLinha(leitura, aoEditar, aoExcluir) {
   excluir.addEventListener('click', () => aoExcluir(leitura));
   acoes.append(editar, excluir);
   const valor = (leituraTurno) => leituraTurno === null || leituraTurno === undefined ? '—' : `${leituraTurno} kWh`;
-  linha.append(criarCelula(formatarData(leitura.data)), criarCelula(valor(leitura.leitura_manha)), criarCelula(valor(leitura.leitura_noite)), consumo, criarFotos(leitura), acoes);
+  linha.append(
+    criarCelula(formatarData(leitura.data), 'Data'),
+    criarCelula(valor(leitura.leitura_manha), 'Manhã'),
+    criarCelula(valor(leitura.leitura_noite), 'Noite'),
+    consumo,
+    criarFotos(leitura),
+    acoes
+  );
   return linha;
 }
 
@@ -74,6 +85,7 @@ export function criarHistorico({ aoEditar, aoExcluir, aoMudarPagina, limite }) {
       document.querySelector('#entries-table tbody').replaceChildren(...resultado.data.map((leitura) => criarLinha(leitura, aoEditar, aoExcluir)));
       document.querySelector('#empty-state').classList.toggle('hidden', resultado.total !== 0);
       document.querySelector('#table-wrap').classList.toggle('hidden', resultado.total === 0);
+      document.querySelector('#carousel-hint').classList.toggle('hidden', resultado.total <= 1);
       document.querySelector('#btn-export').classList.toggle('hidden', resultado.total === 0);
 
       const paginas = Math.ceil(resultado.total / limite);

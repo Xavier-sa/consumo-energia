@@ -39,7 +39,7 @@ h2 { margin-bottom: 0; font-size: clamp(1.35rem, 3vw, 1.7rem); letter-spacing: -
 .login-shell { min-height: 100vh; display: grid; place-content: center; gap: 22px; padding: 24px; background: radial-gradient(circle at 50% 0, #e1f1e9, transparent 45%), var(--cream); }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--green-950); }
 .brand-login { justify-content: center; font-size: 1.2rem; }
-.brand-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; color: #fff; background: var(--green-800); font-size: 1.05rem; box-shadow: 0 5px 15px rgba(23, 76, 60, .22); }
+.brand-icon { display: block; width: 36px; height: 36px; border: 2px solid rgba(23, 76, 60, .14); border-radius: 11px; object-fit: cover; box-shadow: 0 5px 15px rgba(23, 76, 60, .22); }
 .login-card { width: min(430px, calc(100vw - 32px)); padding: clamp(26px, 6vw, 44px); border: 1px solid rgba(255,255,255,.8); border-radius: var(--radius-lg); background: rgba(255,255,255,.92); box-shadow: var(--shadow); }
 .login-card h1 { font-size: 2rem; }
 .auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 22px 0; padding: 5px; border-radius: 12px; background: var(--green-50); }
@@ -130,6 +130,7 @@ tr.past { color: #68756f; }
 .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 22px; }
 .pagination button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: #fff; }
 .pagination button[aria-current="page"] { color: #fff; border-color: var(--green-800); background: var(--green-800); }
+.carousel-hint { display: none; }
 .empty-state { padding: 35px 20px; text-align: center; color: var(--muted); }
 .empty-state > span { font-size: 2rem; }
 .empty-state h3 { margin: 10px 0 5px; color: var(--ink); }
@@ -160,6 +161,27 @@ tr.past { color: #68756f; }
   .button-save { width: 100%; }
   .history-heading { align-items: flex-start; flex-direction: column; }
   .history-heading .button { width: 100%; }
+  #entries-table, #entries-table tbody, #entries-table tr, #entries-table td { display: block; width: 100%; }
+  #entries-table thead { display: none; }
+  #entries-table tbody { display: flex; gap: 12px; padding: 2px 28px 10px 0; overflow-x: auto; overscroll-behavior-inline: contain; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; touch-action: pan-x pan-y; }
+  #entries-table tbody::-webkit-scrollbar { display: none; }
+  #entries-table tr { flex: 0 0 calc(100% - 28px); width: calc(100% - 28px); padding: 5px 16px; border: 1px solid var(--line); border-radius: 14px; background: #fff; scroll-snap-align: start; scroll-snap-stop: always; }
+  #entries-table td { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 48px; padding: 11px 0; white-space: normal; }
+  #entries-table td::before { flex: 0 0 auto; content: attr(data-label); color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  #entries-table td:first-child { width: calc(100% + 32px); margin: -5px -16px 4px; padding: 14px 16px; border-bottom-color: var(--green-100); border-radius: 14px 14px 0 0; color: var(--green-950); background: var(--green-50); font-weight: 800; }
+  #entries-table td:first-child::before { color: var(--green-700); }
+  #entries-table .photo-links { flex-wrap: wrap; }
+  #entries-table .photo-links::before { margin-right: auto; }
+  #entries-table .actions { justify-content: flex-end; }
+  #entries-table .actions::before { margin-right: auto; }
+  #entries-table tr:last-child td:last-child { border-bottom: 0; }
+  .carousel-hint { display: flex; align-items: center; gap: 7px; margin: -10px 0 12px; color: var(--muted); font-size: .8rem; font-weight: 600; }
+  .carousel-hint span { color: var(--green-700); font-size: 1rem; }
+  .table-wrap { overflow-x: visible; }
+  .admin-table-wrap { overflow-x: auto; }
+  .admin-table-wrap table { min-width: 680px; }
+  .pagination { flex-wrap: wrap; gap: 5px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .pagination button { min-width: 34px; width: 34px; height: 34px; border-radius: 8px; font-size: .8rem; }
   th, td { padding: 13px 10px; }
   .admin-section-heading { align-items: stretch; flex-direction: column; gap: 4px; }
   .admin-section-heading > div { width: 100%; }
