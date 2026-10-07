@@ -13,5 +13,20 @@ export function criarControleAcesso() {
 
   document.querySelector('#show-login').addEventListener('click', () => alternar('login'));
   document.querySelector('#show-register').addEventListener('click', () => alternar('register'));
+
+  document.querySelectorAll('[data-legal-document]').forEach((link) => {
+    link.addEventListener('click', (evento) => {
+      evento.preventDefault();
+      document.querySelector(`#${link.dataset.legalDocument}`).showModal();
+    });
+  });
+  document.querySelectorAll('[data-close-legal]').forEach((botao) => {
+    botao.addEventListener('click', () => botao.closest('dialog').close());
+  });
+  document.querySelectorAll('.legal-dialog').forEach((dialogo) => {
+    dialogo.addEventListener('click', (evento) => {
+      if (evento.target === dialogo) dialogo.close();
+    });
+  });
   return { alternar };
 }

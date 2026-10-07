@@ -43,7 +43,12 @@ final class ControladorAutenticacao
             Resposta::json(['message' => 'A confirmação da senha não confere.'], 422);
             return;
         }
-        $usuario = $this->servico->cadastrar((string) ($dados['username'] ?? ''), $senha, Requisicao::ip());
+        $usuario = $this->servico->cadastrar(
+            (string) ($dados['username'] ?? ''),
+            $senha,
+            Requisicao::ip(),
+            ($dados['aceite_documentos'] ?? null) === true
+        );
         session_regenerate_id(true);
         $_SESSION['user'] = $usuario;
         Resposta::json(['ok' => true, 'user' => $usuario], 201);

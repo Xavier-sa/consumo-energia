@@ -33,7 +33,14 @@ final class RepositorioUsuarios extends RepositorioJson
         return null;
     }
 
-    public function cadastrar(string $nome, string $senha, string $ip): array
+    public function cadastrar(
+        string $nome,
+        string $senha,
+        string $ip,
+        string $termosAceitosEm,
+        string $versaoTermos,
+        string $versaoPrivacidade
+    ): array
     {
         $usuarios = $this->ler();
         foreach ($usuarios as $usuario) {
@@ -51,6 +58,9 @@ final class RepositorioUsuarios extends RepositorioJson
             'role' => 'user',
             'last_ip' => $ip,
             'accesses' => [['at' => date('c'), 'ip' => $ip]],
+            'termos_aceitos_em' => $termosAceitosEm,
+            'versao_termos' => $versaoTermos,
+            'versao_politica_privacidade' => $versaoPrivacidade,
         ];
         $usuarios[] = $usuario;
         $this->gravar($usuarios);

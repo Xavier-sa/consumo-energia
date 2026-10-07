@@ -48,13 +48,27 @@ try {
     });
 
     executar('cadastro cria conta em residência isolada', function () use ($autenticacao, $usuariosArquivo): void {
-        $sessao = $autenticacao->cadastrar('NOVA.PESSOA', 'senha-segura', '127.0.0.2');
+        $sessao = $autenticacao->cadastrar('NOVA.PESSOA', 'senha-segura', '127.0.0.2', true);
         afirmar(($sessao['residencia_id'] ?? null) === 2, 'A nova conta deveria receber a residência 2.');
         $usuarios = json_decode((string) file_get_contents($usuariosArquivo), true);
         $novo = $usuarios[count($usuarios) - 1];
         afirmar(!isset($novo['password']), 'Cadastro não deve armazenar senha em texto simples.');
         afirmar(password_verify('senha-segura', $novo['password_hash']), 'Cadastro deve armazenar um hash válido.');
         afirmar($sessao['role'] === 'user' && $novo['role'] === 'user', 'Cadastro novo deve permanecer usuário comum.');
+        afirmar(isset($novo['termos_aceitos_em']) && strtotime($novo['termos_aceitos_em']) !== false, 'Cadastro deve registrar a data do aceite.');
+        afirmar($novo['versao_termos'] === '1.0', 'Cadastro deve registrar a versão dos Termos.');
+        afirmar($novo['versao_politica_privacidade'] === '1.0', 'Cadastro deve registrar a versão da Política.');
+    });
+
+    executar('cadastro sem aceite é rejeitado sem persistência', function () use ($autenticacao, $usuariosArquivo): void {
+        $quantidade = count(json_decode((string) file_get_contents($usuariosArquivo), true));
+        try {
+            $autenticacao->cadastrar('SEM.ACEITE', 'senha-segura', '127.0.0.7', false);
+            afirmar(false, 'Cadastro sem aceite deveria falhar.');
+        } catch (DomainException $erro) {
+            afirmar(strpos($erro->getMessage(), 'leia e aceite') !== false, 'A falha deveria explicar o aceite necessário.');
+        }
+        afirmar(count(json_decode((string) file_get_contents($usuariosArquivo), true)) === $quantidade, 'Cadastro sem aceite não deve alterar o JSON.');
     });
 
     executar('Xavier legado recebe e persiste o papel de administrador', function () use ($autenticacao, $usuariosArquivo): void {
@@ -67,7 +81,7 @@ try {
     executar('cadastro duplicado é rejeitado sem gravar usuário', function () use ($autenticacao, $usuariosArquivo): void {
         $quantidade = count(json_decode((string) file_get_contents($usuariosArquivo), true));
         try {
-            $autenticacao->cadastrar('nova.pessoa', 'outra-senha', '127.0.0.3');
+            $autenticacao->cadastrar('nova.pessoa', 'outra-senha', '127.0.0.3', true);
             afirmar(false, 'O cadastro duplicado deveria falhar.');
         } catch (DomainException $erro) {
             afirmar($erro->getMessage() === 'Não foi possível criar a conta com esses dados.', 'A falha deveria usar mensagem genérica.');
@@ -90,7 +104,7 @@ try {
     });
 
     executar('variação do nome Xavier não recebe poder administrativo', function () use ($autenticacao): void {
-        $sessao = $autenticacao->cadastrar('XAVIER.NOVO', 'senha-segura', '127.0.0.6');
+        $sessao = $autenticacao->cadastrar('XAVIER.NOVO', 'senha-segura', '127.0.0.6', true);
         afirmar($sessao['role'] === 'user', 'Uma conta nova com variação do nome Xavier deve ser comum.');
     });
 
@@ -118,7 +132,7 @@ try {
     executar('validação aplica limites de usuário e senha', function () use ($autenticacao): void {
         foreach ([['AB', 'senha-forte'], ['USUARIO', '1234567']] as [$usuario, $senha]) {
             try {
-                $autenticacao->cadastrar($usuario, $senha, '127.0.0.4');
+                $autenticacao->cadastrar($usuario, $senha, '127.0.0.4', true);
                 afirmar(false, 'Dados fora dos limites deveriam falhar.');
             } catch (DomainException $erro) {
                 afirmar($erro->getMessage() !== '', 'A validação deveria explicar o limite inválido.');
@@ -133,6 +147,9 @@ try {
         afirmar(strpos($pagina, 'id="show-register"') !== false, 'A interface deveria oferecer a aba Criar conta.');
         afirmar(strpos($pagina, '<input id="username"') !== false, 'O login deveria usar um campo livre de usuário.');
         afirmar(strpos($pagina, '<select id="username"') === false, 'O login não deveria limitar usuários a um seletor fixo.');
+        afirmar(strpos($pagina, 'id="register-legal-acceptance"') !== false, 'O cadastro deveria exigir aceite dos documentos.');
+        afirmar(strpos($pagina, 'data-legal-document="terms-dialog"') !== false, 'O cadastro deveria oferecer os Termos de Uso.');
+        afirmar(strpos($pagina, 'data-legal-document="privacy-dialog"') !== false, 'O cadastro deveria oferecer a Política de Privacidade.');
     });
 
     executar('README divulga a aplicação sem webhook', function (): void {
