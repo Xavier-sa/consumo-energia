@@ -1,6 +1,6 @@
 # Termos de Uso
 
-**Versão:** 1.0  
+**Versão:** 1.0
 **Vigência:** 7 de outubro de 2026
 
 Estes Termos de Uso regulam o uso do Meu Consumo. Leia este documento e a

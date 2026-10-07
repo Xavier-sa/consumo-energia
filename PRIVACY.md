@@ -1,6 +1,6 @@
 # Política de Privacidade
 
-**Versão:** 1.0  
+**Versão:** 1.0
 **Vigência:** 7 de outubro de 2026
 
 Esta Política explica como o Meu Consumo trata dados pessoais. Ela descreve o
