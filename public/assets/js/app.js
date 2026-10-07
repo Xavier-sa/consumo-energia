@@ -1,5 +1,5 @@
-import { api } from './api/cliente-api.js?v=20260814-4';
-import { criarControleAcesso } from './componentes/acesso.js?v=20260814-3';
+import { api } from './api/cliente-api.js?v=20261007-1';
+import { criarControleAcesso } from './componentes/acesso.js?v=20261007-1';
 import { criarFormularioLeitura } from './componentes/formulario-leitura.js?v=20260814-2';
 import { criarHistorico } from './componentes/historico.js?v=20261006-1';
 import { criarPainelAdmin } from './componentes/painel-admin.js?v=20260814-4';
@@ -65,8 +65,14 @@ async function iniciar() {
     const usuario = document.querySelector('#register-username').value;
     const senha = document.querySelector('#register-password').value;
     const confirmacao = document.querySelector('#register-confirmation').value;
+    const aceite = document.querySelector('#register-legal-acceptance');
+    if (!aceite.checked) {
+      document.querySelector('#register-error').textContent = 'Para criar sua conta, leia e aceite os Termos de Uso e a Política de Privacidade.';
+      aceite.focus();
+      return;
+    }
     try {
-      const resposta = await api.cadastrar(usuario, senha, confirmacao);
+      const resposta = await api.cadastrar(usuario, senha, confirmacao, aceite.checked);
       document.querySelector('#register-error').textContent = '';
       mostrarAplicacao(resposta.user);
     } catch (erro) { document.querySelector('#register-error').textContent = erro.message; }

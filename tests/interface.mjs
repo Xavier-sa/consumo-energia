@@ -26,7 +26,7 @@ function elemento() {
 const elementos = Object.fromEntries([
   '#login-form', '#register-form', '#show-login', '#show-register', '#auth-description', '#register-username', '#username',
 ].map((seletor) => [seletor, elemento()]));
-global.document = { querySelector: (seletor) => elementos[seletor] };
+global.document = { querySelector: (seletor) => elementos[seletor], querySelectorAll: () => [] };
 
 const controle = criarControleAcesso();
 controle.alternar('register');

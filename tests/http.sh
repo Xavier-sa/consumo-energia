@@ -50,7 +50,9 @@ resposta="$diretorio_teste/resposta"
 [[ $(requisitar "$cookie_alice" entries GET '' "$resposta") == '401' ]]
 [[ $(requisitar "$cookie_alice" admin_dashboard GET '' "$resposta") == '401' ]]
 [[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"diferente"}' "$resposta") == '422' ]]
-[[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '201' ]]
+[[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '422' ]]
+grep -q 'leia e aceite' "$resposta"
+[[ $(requisitar "$cookie_alice" register POST '{"username":"ALICE","password":"senha-forte","password_confirmation":"senha-forte","aceite_documentos":true}' "$resposta") == '201' ]]
 grep -q '"username":"ALICE"' "$resposta"
 grep -q '"residencia_id":2' "$resposta"
 [[ $(requisitar "$cookie_alice" me GET '' "$resposta") == '200' ]]
@@ -62,8 +64,8 @@ grep -q '"total":0' "$resposta"
 grep -q '"residencia_id":2' "$resposta"
 id_alice=$(php -r '$d=json_decode(file_get_contents($argv[1]), true); echo $d["item"]["identificador"];' "$resposta")
 
-[[ $(requisitar "$cookie_bob" register POST '{"username":"BOB","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '201' ]]
-[[ $(requisitar "$diretorio_teste/duplicado.cookie" register POST '{"username":"bob","password":"senha-forte","password_confirmation":"senha-forte"}' "$resposta") == '422' ]]
+[[ $(requisitar "$cookie_bob" register POST '{"username":"BOB","password":"senha-forte","password_confirmation":"senha-forte","aceite_documentos":true}' "$resposta") == '201' ]]
+[[ $(requisitar "$diretorio_teste/duplicado.cookie" register POST '{"username":"bob","password":"senha-forte","password_confirmation":"senha-forte","aceite_documentos":true}' "$resposta") == '422' ]]
 [[ $(requisitar "$cookie_bob" entries GET '' "$resposta") == '200' ]]
 grep -q '"total":0' "$resposta"
 [[ $(requisitar "$cookie_bob" "update_entry&id=$id_alice" POST '{"date":"2026-08-14","shift":"morning","morning":"999"}' "$resposta") == '404' ]]

@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/componentes/botao.php';
 require_once dirname(__DIR__) . '/componentes/campo_foto.php';
 require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
+require_once dirname(__DIR__) . '/componentes/documentos_legais.php';
 ?>
 <!doctype html>
 <html lang="pt-BR">
@@ -14,7 +15,7 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
   <title>Meu Consumo de Energia</title>
   <link rel="icon" href="assets/images/icone-energia-consumo.jpeg" type="image/jpeg">
   <link rel="apple-touch-icon" href="assets/images/icone-energia-consumo.jpeg">
-  <link rel="stylesheet" href="assets/css/main.css?v=20261006-1">
+  <link rel="stylesheet" href="assets/css/main.css?v=20261007-1">
 </head>
 <body>
   <main id="app">
@@ -43,6 +44,11 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
           <input id="register-password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
           <label for="register-confirmation">Confirme a senha</label>
           <input id="register-confirmation" type="password" autocomplete="new-password" minlength="8" maxlength="72" required>
+          <div class="legal-acceptance">
+            <input id="register-legal-acceptance" type="checkbox" required aria-describedby="register-legal-help">
+            <label for="register-legal-acceptance">Li e aceito os <a href="#terms-dialog" data-legal-document="terms-dialog">Termos de Uso</a> e a <a href="#privacy-dialog" data-legal-document="privacy-dialog">Política de Privacidade</a>.</label>
+          </div>
+          <p id="register-legal-help" class="form-help">Os documentos abrem nesta tela sem apagar os dados preenchidos.</p>
           <?php botao('Criar minha conta', 'btn-register', 'primary', 'submit', 'button-block'); ?>
           <p id="register-error" class="message message-error" role="alert" aria-live="polite"></p>
         </form>
@@ -123,7 +129,13 @@ require_once dirname(__DIR__) . '/componentes/campo_leitura.php';
         </section>
       </div>
     </dialog>
+    <footer class="site-footer" aria-label="Informações legais">
+      <a href="#terms-dialog" data-legal-document="terms-dialog">Termos de Uso</a>
+      <a href="#privacy-dialog" data-legal-document="privacy-dialog">Política de Privacidade</a>
+      <a href="https://github.com/Xavier-sa/consumo-energia" rel="external">Projeto no GitHub</a>
+    </footer>
+    <?php documentosLegais(); ?>
   </main>
-  <script type="module" src="assets/js/app.js?v=20261006-1"></script>
+  <script type="module" src="assets/js/app.js?v=20261007-1"></script>
 </body>
 </html>
